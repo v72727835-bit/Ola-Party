@@ -1,0 +1,20 @@
+{
+  "name": "party-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Party App: React Native social rooms with a TypeScript Node backend",
+  "type": "module",
+  "engines": { "node": ">=24.15.0" },
+  "scripts": {
+    "setup": "node scripts/project.mjs install",
+    "dev": "node scripts/project.mjs dev",
+    "dev:api": "npm --prefix apps/api run dev",
+    "dev:mobile": "npm --prefix apps/mobile start",
+    "dev:admin": "npm --prefix apps/admin run dev",
+    "setup:voice": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-local-voice.ps1",
+    "dev:voice": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-local-voice.ps1",
+    "check": "node scripts/project.mjs check",
+    "test": "npm --prefix apps/api test",
+    "build": "node scripts/project.mjs build"
+  }
+}

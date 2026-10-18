@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Party App",
+    "slug": "party-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "android": {
+      "package": "app.party.social"
+    },
+    "ios": {
+      "bundleIdentifier": "app.party.social"
+    },
+    "plugins": [
+      "@livekit/react-native-expo-plugin",
+      "@config-plugins/react-native-webrtc"
+    ]
+  }
+}
