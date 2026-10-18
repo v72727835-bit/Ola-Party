@@ -10,6 +10,7 @@ import { dirname, resolve } from 'node:path';
 import { z } from 'zod';
 import { AccessToken, RoomServiceClient } from 'livekit-server-sdk';
 import { registerFeatures, sha } from './features.js';
+import { seedState, welcomeMessages } from './seed.js';
 
 type Row = Record<string, any>;
 type State = { games?:Row[]; battles?:Row[]; users: Row[]; sessions: Row[]; rooms: Row[]; messages: Row[]; ledger: Row[]; posts: Row[]; comments: Row[]; families: Row[]; events: Row[]; reports: Row[]; claims: Row[]; audit?: Row[] };
@@ -30,10 +31,7 @@ export function createApp(options:{dataFile?:string;demo?:boolean}={}) {
  const demo=options.demo ?? (process.env.ENABLE_DEMO==='true' && process.env.NODE_ENV!=='production');
  let state:State;
  if(existsSync(file)) state=JSON.parse(readFileSync(file,'utf8'));
- else {
-  const users=['Aarav','Meera','Zoya'].map((name,i)=>({id:`demo-${i+1}`,name,email:`demo${i+1}@example.invalid`,password:hashPassword(randomBytes(32).toString('hex')),avatar:['🌻','🌸','🦋'][i],bio:'Demo profile',country:'IN',followers:[],following:[],blocked:[],coins:0,diamonds:0,vip:false,role:'user',demo:true}));
-  state={users,sessions:[],rooms:users.map((u,i)=>({id:`room-${i+1}`,title:['Chill & Chai','Music Lounge','Late Night Talks'][i],description:'Demo room — join to start a conversation',category:['Chat','Music','Friends'][i],cover:['#7047EB','#E75FA0','#208E9C'][i],ownerId:u.id,members:[],seats:Array.from({length:8},(_,index)=>({index,userId:null,muted:false,locked:false})),locked:false,password:null,demo:true})),messages:[],ledger:[],posts:users.map((u,i)=>({id:`post-${i+1}`,authorId:u.id,text:['Welcome to our community! What music are you listening to?','A little kindness goes a long way 🌸','Your next conversation starts here ✨'][i],image:null,likes:[],createdAt:now(),demo:true})),comments:[],families:[{id:'family-1',name:'Good Vibes',description:'A demo community for new friends',ownerId:users[0].id,members:[],demo:true}],events:[{id:'event-1',title:'Community Music Night',description:'Demo event. Schedule your own gathering with friends.',startsAt:null,attendees:[],demo:true}],reports:[],claims:[]};
- }
+ else state=seedState(p=>hashPassword(p),()=>randomBytes(32).toString('hex')) as State;
  const save=()=>{mkdirSync(dirname(file),{recursive:true});writeFileSync(file+'.tmp',JSON.stringify(state));renameSync(file+'.tmp',file);}; save();
  const app=express(); const http=createServer(app); const io=new Server(http,{cors:{origin:process.env.CLIENT_ORIGIN?.split(',') || ['http://localhost:8081','http://localhost:19006','http://localhost:5173','http://localhost:5174','http://127.0.0.1:8081','http://127.0.0.1:5173','http://127.0.0.1:5174']}});
  app.use(helmet(),cors({origin:process.env.CLIENT_ORIGIN?.split(',') || ['http://localhost:8081','http://localhost:19006','http://localhost:5173','http://localhost:5174','http://127.0.0.1:8081','http://127.0.0.1:5173','http://127.0.0.1:5174']}),express.json({limit:'64kb'}));
@@ -42,7 +40,7 @@ export function createApp(options:{dataFile?:string;demo?:boolean}={}) {
  const auth=(req:Request,res:Response,next:NextFunction)=>{const token=req.headers.authorization?.replace(/^Bearer /,'');const user=token&&authenticate(token); if(!user) return next(new ApiError(401,'UNAUTHORIZED','Please sign in'));res.locals.user=user;next();};
  const user=(id:string)=>state.users.find(u=>u.id===id)||fail(404,'NOT_FOUND','User not found');
  const room=(id:string)=>state.rooms.find(r=>r.id===id)||fail(404,'NOT_FOUND','Room not found');
- const cleanRoom=(r:Row)=>{const {password,...rest}=r;return rest;};
+ const cleanRoom=(r:Row)=>{const {password,...rest}=r;const ids=[...new Set([...(r.members||[]),...(r.seats||[]).map((x:Row)=>x.userId).filter(Boolean)])];const people=ids.map(id=>state.users.find(u=>u.id===id)).filter(Boolean).map(u=>({id:u!.id,name:u!.name,avatar:u!.avatar,vip:!!u!.vip}));return {...rest,people};};
  const member=(r:Row,u:Row)=>r.members.includes(u.id)||fail(403,'ROOM_MEMBERSHIP_REQUIRED','Join this room first');
  const owner=(r:Row,u:Row)=>r.ownerId===u.id||fail(403,'OWNER_REQUIRED','Only the room owner can do this');
  const blocked=(a:Row,b:Row)=>a.blocked.includes(b.id)||b.blocked.includes(a.id);
@@ -55,7 +53,7 @@ export function createApp(options:{dataFile?:string;demo?:boolean}={}) {
  app.use('/api/auth',rateLimit({windowMs:60000,limit:20}));
  route('post','/auth/register',(req)=>{const b=z.object({name:z.string().trim().min(2).max(40),email:z.email().max(254),password:z.string().min(8).max(128)}).parse(req.body);const email=b.email.toLowerCase();if(state.users.some(u=>u.email===email))fail(409,'EMAIL_EXISTS','Email already registered');const u={id:uid(),name:b.name,email,password:hashPassword(b.password),avatar:'🙂',bio:'',country:'IN',followers:[],following:[],blocked:[],coins:0,diamonds:0,vip:false,role:'user',demo:false};state.users.push(u);return login(u);},false);
  route('post','/auth/login',(req)=>{const b=z.object({email:z.string(),password:z.string().max(128)}).parse(req.body);const u=state.users.find(x=>x.email===b.email.toLowerCase());if(!u||u.disabled||!passwordMatches(b.password,u.password))fail(401,'INVALID_CREDENTIALS','Email or password is incorrect');return login(u!);},false);
- route('post','/auth/demo',()=>{if(!demo)fail(403,'DEMO_DISABLED','Demo access is disabled');const u={...state.users[0],id:uid(),name:'Guest '+randomBytes(2).toString('hex'),email:`${uid()}@example.invalid`,followers:[],following:[],blocked:[],coins:500,diamonds:0,demo:true};state.users.push(u);return login(u);},false);
+ route('post','/auth/demo',()=>{if(!demo)fail(403,'DEMO_DISABLED','Demo access is disabled');const u={...state.users[0],id:uid(),name:'Guest '+randomBytes(2).toString('hex'),email:`${uid()}@example.invalid`,avatar:'🙂',bio:'New here 👋',vip:false,followers:[],following:[],blocked:[],coins:500,diamonds:0,demo:true};state.users.push(u);welcomeMessages.forEach(([i,text],k)=>{const from=state.users.find(x=>x.id===`demo-${i+1}`);if(from)state.messages.push({id:uid(),fromId:from.id,toId:u.id,text,createdAt:new Date(Date.now()-(welcomeMessages.length-k)*60000).toISOString()});});return login(u);},false);
  route('post','/auth/logout',(req,u)=>{for(const s of io.sockets.sockets.values())if(s.data.tokenHash===tokenHash(req.headers.authorization!.slice(7)))s.disconnect(true);state.sessions=state.sessions.filter(s=>s.hash!==tokenHash(req.headers.authorization!.slice(7)));save();return {ok:true};});
  route('post','/auth/admin-demo',()=>{if(!demo)fail(403,'DEMO_DISABLED','Demo access disabled');let u=state.users.find(u=>u.id==='demo-admin');if(!u){u={...state.users[0],id:'demo-admin',name:'Demo Administrator',email:'admin@example.invalid',role:'admin',coins:0,diamonds:0,followers:[],following:[],blocked:[],demo:true};state.users.push(u);}return login(u);},false);
  const admin=(u:Row)=>{if(u.role!=='admin')fail(403,'ADMIN_REQUIRED','Administrator access required');};
