@@ -146,7 +146,7 @@ export function registerFeatures(ctx: Row) {
     state.otps = state.otps.filter((x: Row) => x !== o);
     let u = state.users.find((x: Row) => x.phone === b.phone);
     if (u?.disabled) fail(403, 'ACCOUNT_DISABLED', 'This account is disabled');
-    if (!u) { u = { id: uid(), name: b.name ?? 'Guest ' + b.phone.slice(-4), email: `phone-${b.phone.replace('+', '')}@phone.invalid`, phone: b.phone, password: '', avatar: '🙂', bio: '', country: 'IN', followers: [], following: [], blocked: [], coins: 0, diamonds: 0, vip: false, role: 'user', demo: false }; state.users.push(u); }
+    if (!u) { u = { id: uid(), name: b.name ?? 'Guest ' + b.phone.slice(-4), email: `phone-${b.phone.replace('+', '')}@phone.invalid`, phone: b.phone, password: '', avatar: '', photo: '', level: 1, bio: '', country: 'IN', followers: [], following: [], blocked: [], coins: 0, diamonds: 0, vip: false, role: 'user', demo: false }; state.users.push(u); }
     return login(u);
   }, false);
 }

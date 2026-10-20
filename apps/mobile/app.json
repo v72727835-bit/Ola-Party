@@ -29,7 +29,14 @@
     "plugins": [
       "@livekit/react-native-expo-plugin",
       "@config-plugins/react-native-webrtc",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Party App needs your photos so you can set a profile picture.",
+          "cameraPermission": "Party App needs the camera so you can take a profile picture."
+        }
+      ]
     ],
     "extra": {
       "eas": {
