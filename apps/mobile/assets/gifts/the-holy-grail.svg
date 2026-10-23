@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="gold" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#FFF3C8"/><stop offset=".24" stop-color="#E3BC71"/><stop offset=".46" stop-color="#F5D68F"/><stop offset=".72" stop-color="#B27A37"/><stop offset="1" stop-color="#E7C17B"/></linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF0BA"/><stop offset=".28" stop-color="#E8BB67"/><stop offset="1" stop-color="#AB7035"/></linearGradient>
+    <linearGradient id="soft" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#FFF0BA"/><stop offset="1" stop-color="#FFE5A4"/></linearGradient>
+    <linearGradient id="petal" x1=".15" y1="0" x2=".8" y2="1"><stop stop-color="#FFE0E0"/><stop offset=".24" stop-color="#F299B0"/><stop offset=".68" stop-color="#CF527C"/><stop offset="1" stop-color="#96365C"/></linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A1D0A9"/><stop offset="1" stop-color="#286D58"/></linearGradient>
+    <linearGradient id="ivory" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFCF3"/><stop offset=".6" stop-color="#F4E3D7"/><stop offset="1" stop-color="#C5A7BB"/></linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E5FBFF"/><stop offset=".36" stop-color="#AAD7E4"/><stop offset=".7" stop-color="#7799BA"/><stop offset="1" stop-color="#D7EDF5"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#090611" flood-opacity=".26"/></filter>
+  </defs>
+  <g filter="url(#shadow)"><path d="M77 63L164 63L157 120Q155 143 130 148L131 181L153 192L153 201L86 201L86 192L109 181L110 149Q89 144 85 121Z" fill="url(#gold)" /><path d="M93 76L98 111Q99 127 111 132" fill="none" stroke="#FFF1BD" stroke-width="5"/><g transform="translate(121 107)"><path d="M0 -17L17 -4.25L10.2 13.600000000000001L-10.2 13.600000000000001L-17 -4.25Z" fill="url(#body)" /><path d="M0 -17L5.1 0L0 13.600000000000001L-6.800000000000001 0Z" fill="#FFFFFF85" /><path d="M-11.899999999999999 -3.4000000000000004L11.899999999999999 -3.4000000000000004" fill="none" stroke="#FFFFFF88" stroke-width="1" stroke-linecap="round"/></g></g><path d="M48 69Q49 73 53 74Q49 75 48 79Q47 75 43 74Q47 73 48 69" fill="#EDD5AB" /><circle cx="190" cy="165" r="2.5" fill="#DEC3A0" /></svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="gold" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#FFF3C8"/><stop offset=".24" stop-color="#E3BC71"/><stop offset=".46" stop-color="#F5D68F"/><stop offset=".72" stop-color="#B27A37"/><stop offset="1" stop-color="#E7C17B"/></linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF0BA"/><stop offset=".28" stop-color="#E8BB67"/><stop offset="1" stop-color="#AB7035"/></linearGradient>
+    <linearGradient id="soft" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#FFF0BA"/><stop offset="1" stop-color="#FFE5A4"/></linearGradient>
+    <linearGradient id="petal" x1=".15" y1="0" x2=".8" y2="1"><stop stop-color="#FFE0E0"/><stop offset=".24" stop-color="#F299B0"/><stop offset=".68" stop-color="#CF527C"/><stop offset="1" stop-color="#96365C"/></linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A1D0A9"/><stop offset="1" stop-color="#286D58"/></linearGradient>
+    <linearGradient id="ivory" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFCF3"/><stop offset=".6" stop-color="#F4E3D7"/><stop offset="1" stop-color="#C5A7BB"/></linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E5FBFF"/><stop offset=".36" stop-color="#AAD7E4"/><stop offset=".7" stop-color="#7799BA"/><stop offset="1" stop-color="#D7EDF5"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#090611" flood-opacity=".26"/></filter>
+  </defs>
+  <g filter="url(#shadow)"><path d="M54 177Q81 188 101 166Q115 148 104 127Q68 114 77 80Q85 49 119 65L147 44L142 79Q180 87 177 109L153 124L140 118Q164 159 140 188Q110 220 65 196Z" fill="url(#body)" /><path d="M109 138Q155 94 185 52L184 127L154 132L148 151Z" fill="url(#gold)" /><path d="M102 143Q73 103 44 82L49 148L77 143L91 166Z" fill="url(#gold)" /><path d="M82 89Q74 69 92 66M99 168Q115 181 98 193" fill="none" stroke="#FFFFFF88" stroke-width="4"/><circle cx="137" cy="91" r="4" fill="#F6E8BD" /><path d="M151 113L196 124L170 103Z" fill="url(#petal)" /><path d="M81 64L93 45L103 67Z" fill="url(#gold)" /></g><path d="M185 46Q186 55 195 56Q186 57 185 66Q184 57 175 56Q184 55 185 46" fill="url(#gold)" /><path d="M48 69Q49 73 53 74Q49 75 48 79Q47 75 43 74Q47 73 48 69" fill="#EDD5AB" /><circle cx="190" cy="165" r="2.5" fill="#DEC3A0" /></svg>

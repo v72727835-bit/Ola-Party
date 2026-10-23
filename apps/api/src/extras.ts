@@ -3,7 +3,7 @@
 import { z } from 'zod';
 type Row = Record<string, any>;
 
-export const ROOM_THEMES = ['galaxy', 'sunset', 'ocean', 'forest', 'royal', 'midnight'] as const;
+export const ROOM_THEMES = ['teal', 'galaxy', 'sunset', 'ocean', 'forest', 'royal', 'midnight'] as const;
 const PHOTO_MAX = 600_000; // bytes of base64 text
 
 export function medalsFor(u: Row, state: Row) {

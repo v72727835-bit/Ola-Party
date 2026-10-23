@@ -1,0 +1,133 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { giftAssets, giftFinishes } from './giftAssets';
+
+type Row = Record<string, any>;
+type Api = (path: string, method?: string, body?: Row) => Promise<any>;
+const known: Record<string, Row> = {};
+export function rememberGifts(gifts: Row[]) { gifts.forEach(g => { known[g.id] = g; }); }
+export const giftMetadata = (id: string) => known[id];
+export function GiftArtwork({ id, size = 60, emoji, label, color }: { id?: string; size?: number; emoji?: string; label?: string; color?: string }) {
+  const tint = ({ gold: '#EBC789', pink: '#EAA5B7', blue: '#92CDD9', purple: '#C4AFE7' }[color || 'gold']);
+  return <View accessible={false} style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+    <Image source={giftFinishes[id || '']?.[color || ''] || giftAssets[id || ''] || giftAssets['floral-gift-box']} resizeMode="contain" fadeDuration={120} style={{ width: size, height: size }} />
+    {!!label && size >= 90 && <View style={{ position: 'absolute', bottom: 0, maxWidth: size + 30, paddingHorizontal: 9, paddingVertical: 3, backgroundColor: '#1C1925', borderRadius: 5, borderWidth: .5, borderColor: tint + '70' }}><Text numberOfLines={1} style={{ color: tint, fontSize: 10, fontWeight: '600' }}>{label}</Text></View>}
+  </View>;
+}
+
+function Action({ title, onPress, disabled = false, compact = false }: { title: string; onPress: () => void; disabled?: boolean; compact?: boolean }) {
+  return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={({ pressed }) => [s.action, compact && { paddingHorizontal: 11 }, disabled && { opacity: .35 }, pressed && { opacity: .85, transform: [{ scale: .98 }] }]}><Text style={{ fontSize: 13, fontWeight: '700', color: '#302317' }}>{title}</Text></Pressable>;
+}
+
+export default function GiftDrawer({ api, user, members, initialRecipient, roomId, bottom, onClose, onSent, onWallet }: {
+  api: Api; user: Row; members: Row[]; initialRecipient?: string; roomId?: string; bottom: number;
+  onClose: () => void; onSent: (transaction: Row) => void; onWallet: () => void;
+}) {
+  const { height, width } = useWindowDimensions();
+  const artSize = Math.min(80, (Math.min(width, 520) - 28) / 4 - 8);
+  const avatarHost = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/api\/?$/, '');
+  const [catalog, setCatalog] = useState<Row | null>(null); const [category, setCategory] = useState('Activity');
+  const [selected, setSelected] = useState<Row | null>(null); const [recipient, setRecipient] = useState(initialRecipient || members[0]?.id || '');
+  const [quantity, setQuantity] = useState(1); const [quantityOpen, setQuantityOpen] = useState(false); const [sort, setSort] = useState('Default'); const [search, setSearch] = useState('');
+  const [inventory, setInventory] = useState<Row[]>([]); const [customs, setCustoms] = useState<Row[]>([]); const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [info, setInfo] = useState('');
+  const [overlay, setOverlay] = useState<'' | 'broadcast' | 'recharge' | 'custom'>(''); const [recharge, setRecharge] = useState<Row | null>(null);
+  const [label, setLabel] = useState(''); const [message, setMessage] = useState(''); const [color, setColor] = useState('gold'); const [agreed, setAgreed] = useState(false);
+  const lock = useRef(false); const intent = useRef<{ payload: string; key: string } | null>(null);
+  const categoryScroll = useRef<ScrollView>(null);
+  const categoryOffsets = useRef<Record<string, number>>({});
+  useEffect(() => { categoryScroll.current?.scrollTo({ x: Math.max(0, (categoryOffsets.current[category] || 0) - 18), animated: false }); }, [category, width]);
+  const load = async () => { setLoading(true); setError(''); try { const [data, owned, saved] = await Promise.all([api('/gifts/catalog'), api('/me/gift-inventory'), api('/me/custom-gifts')]); rememberGifts(data.gifts); setCatalog(data); setInventory(owned); setCustoms(saved); } catch (e: any) { setError(e.message); } finally { setLoading(false); } };
+  useEffect(() => { load(); AsyncStorage.getItem('gift-broadcast-intro-v1').then(v => { if (!v) setOverlay('broadcast'); }).catch(() => {}); }, []);
+  useEffect(() => { if (!members.some(m => m.id === recipient)) setRecipient(members[0]?.id || ''); }, [members.map(m => m.id).join(), recipient]);
+  const run = async (fn: () => Promise<void>) => { if (lock.current) return; lock.current = true; setBusy(true); setError(''); setInfo(''); try { await fn(); } catch (e: any) { setError(e.message); } finally { lock.current = false; setBusy(false); } };
+  const openRecharge = () => { setOverlay('recharge'); setRecharge(null); run(async () => setRecharge(await api('/wallet/recharge'))); };
+  const chooseCategory = (next: string) => { setCategory(next); setSelected(null); setQuantity(1); setQuantityOpen(false); setSearch(''); setError(''); setInfo(''); };
+  const owned = selected?.inventoryId ? inventory.find(i => i.id === selected.inventoryId) : null;
+  const total = selected ? (owned ? 0 : selected.cost * quantity) : 0;
+  const custom = customs.find(g => g.giftId === selected?.id);
+  let items: Row[] = category === 'Parcel' ? inventory.filter(i => !i.expired && i.quantity > 0 && i.gift).map(i => ({ ...i.gift, inventoryId: i.id, count: i.quantity, expiresAt: i.expiresAt })) : (catalog?.gifts || []).filter((g: Row) => g.category === category);
+  items = items.filter(g => g.name.toLowerCase().includes(search.toLowerCase()));
+  if (sort !== 'Default') items = [...items].sort((a, b) => sort === 'Price ↑' ? a.cost - b.cost : b.cost - a.cost);
+  const send = () => run(async () => {
+    if (!selected || !recipient) return;
+    if (!owned && total > user.coins) { setOverlay('recharge'); setRecharge(null); setRecharge(await api('/wallet/recharge')); return; }
+    const payload = { recipientId: recipient, giftId: selected.id, quantity, ...(roomId ? { roomId } : {}), ...(owned ? { inventoryId: owned.id } : {}) };
+    const serialized = JSON.stringify(payload);
+    if (intent.current?.payload !== serialized) intent.current = { payload: serialized, key: `gift-${Date.now()}-${Math.random().toString(36).slice(2)}` };
+    const data = await api('/gifts/send', 'POST', { ...payload, idempotencyKey: intent.current.key });
+    intent.current = null; onSent(data.transaction); setInfo(`${selected.name} x${quantity} sent!`);
+    if (owned) { setInventory(await api('/me/gift-inventory')); setSelected(null); }
+  });
+  const customize = () => { setLabel(custom?.label || selected?.name || ''); setMessage(custom?.message || ''); setColor(custom?.color || 'gold'); setOverlay('custom'); };
+  const closeIntro = () => { setOverlay(''); AsyncStorage.setItem('gift-broadcast-intro-v1', 'seen').catch(() => {}); };
+  const currentRecipient = members.find(m => m.id === recipient);
+  const displayName = custom?.label || selected?.name;
+  return <View style={[s.drawer, { height: Math.min(height * .65, 620), paddingBottom: Math.max(bottom, 8) }]}>
+    <View style={s.handle} />
+    <View style={s.top}>
+      <View style={{ gap: 3 }}><Text style={s.heading}>Make their day.</Text><Text style={s.subtle}>{currentRecipient ? `A gift for ${currentRecipient.name.split(' ')[0]}` : 'Choose someone to send a gift to'}</Text></View>
+      <Pressable accessibilityRole="button" accessibilityLabel="Close gifts" onPress={onClose} style={s.close}><Ionicons name="close" size={19} color="#B5AFBD" /></Pressable>
+    </View>
+    <ScrollView horizontal style={{ flexGrow: 0, maxHeight: 45 }} contentContainerStyle={s.recipientRow} showsHorizontalScrollIndicator={false}>
+      {members.map(m => { const on = recipient === m.id; return <Pressable accessibilityRole="button" accessibilityLabel={`Send to ${m.name}`} accessibilityState={{ selected: on }} key={m.id} onPress={() => setRecipient(m.id)} style={[s.recipient, on && s.activeChip]}>
+        {m.photo ? <Image source={{ uri: m.photo.startsWith('/') ? avatarHost + m.photo : m.photo }} style={s.avatar} /> : <View style={s.initial}><Text style={{ fontSize: 10, color: '#E5D9C9' }}>{m.name?.slice(0, 1)}</Text></View>}
+        <Text numberOfLines={1} style={[s.recipientText, on && { color: '#F3E6D2' }]}>{m.name}</Text>{on && <Ionicons name="checkmark-circle" size={14} color="#E2BD87" />}
+      </Pressable>; })}
+      {!members.length && <Text style={s.subtle}>Invite someone to your room to get started.</Text>}
+    </ScrollView>
+    <ScrollView ref={categoryScroll} horizontal style={{ flexGrow: 0, maxHeight: 44 }} showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 22, paddingHorizontal: 18 }}>
+      {(catalog?.categories || ['Activity', 'Classic', 'Flying', 'Surprise Gift', 'Relationship', 'Ultra Star', 'Fame', 'Privilege', 'Filters', 'Parcel']).map((cat: string) => <Pressable accessibilityRole="tab" accessibilityState={{ selected: category === cat }} key={cat} onLayout={e => { categoryOffsets.current[cat] = e.nativeEvent.layout.x; if (cat === category) categoryScroll.current?.scrollTo({ x: Math.max(0, e.nativeEvent.layout.x - 18), animated: false }); }} onPress={() => chooseCategory(cat)} style={[s.tab, category === cat && s.tabOn]}><Text style={[s.tabLabel, category === cat && s.tabText]}>{cat}</Text></Pressable>)}
+    </ScrollView>
+    <View style={s.searchRow}><View style={s.searchField}><Ionicons name="search-outline" size={15} color="#817988" /><TextInput accessibilityLabel="Search gifts" placeholder="Find a gift" placeholderTextColor="#817988" value={search} onChangeText={setSearch} style={s.search} />{!!search && <Pressable accessibilityLabel="Clear gift search" onPress={() => setSearch('')}><Ionicons name="close-circle" size={15} color="#817988" /></Pressable>}</View><Pressable accessibilityRole="button" accessibilityLabel={`Sort gifts: ${sort}`} onPress={() => setSort(sort === 'Default' ? 'Price ↑' : sort === 'Price ↑' ? 'Price ↓' : 'Default')} style={s.sort}><Ionicons name="swap-vertical-outline" size={14} color="#A49AAE" /><Text style={s.subtle}>{sort === 'Default' ? 'Curated' : sort}</Text></Pressable></View>
+    {category === 'Privilege' && <View style={s.promo}><MaterialCommunityIcons name="crown-outline" size={17} color="#DEC08E" /><Text style={s.promoText}>The Privilege collection · Unlocks at level 41</Text></View>}
+    {category === 'Surprise Gift' && <View style={s.promo}><Ionicons name="diamond-outline" size={15} color="#DEC08E" /><Text style={s.promoText}>Little treasures. Fixed prices, always.</Text></View>}
+    {category === 'Filters' && <View style={s.promo}><Ionicons name="sparkles-outline" size={15} color="#DEC08E" /><Text style={s.promoText}>A little extra sparkle for the room.</Text></View>}
+    {category === 'Parcel' && <View style={s.promo}><Ionicons name="cube-outline" size={15} color="#DEC08E" /><Text style={s.promoText}>Your gifts, ready to share. Check the expiry below.</Text></View>}
+    {loading ? <View style={s.center}><ActivityIndicator color="#E2BD87" /><Text style={s.subtle}>Finding something lovely…</Text></View> : !catalog ? <View style={s.center}><Text style={s.white}>We couldn’t load the gifts.</Text><Action title="Try again" onPress={load} /></View> : <ScrollView key={category + sort} showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={s.grid}>
+      {items.map(g => {
+        const locked = (user.level || 1) < g.minLevel;
+        const saved = customs.find(x => x.giftId === g.id);
+        const on = selected?.id === g.id && selected?.inventoryId === g.inventoryId;
+        return <Pressable accessibilityRole="button" accessibilityLabel={`${g.name}, ${g.cost} coins${locked ? ', locked' : ''}`} accessibilityState={{ selected: on }} key={g.inventoryId || g.id} onPress={() => { setSelected(g); setQuantity(1); setError(''); setInfo(''); }} style={({ pressed }) => [s.card, on && s.selected, pressed && { backgroundColor: '#FFFFFF08' }]}>
+          {on ? <View style={s.check}><Ionicons name="checkmark" size={10} color="#2E241B" /></View> : !!g.badge && <Text style={[s.badge, g.badge === 'VIP' && { color: '#D6B67E' }]}>{g.badge}</Text>}
+          <View style={{ opacity: locked ? .64 : 1 }}><GiftArtwork id={g.id} size={artSize} color={saved?.color} /></View>
+          <Text style={[s.giftName, on && { color: '#F1D5B1' }]} numberOfLines={2}>{saved?.label || g.name}</Text>
+          <View style={s.priceRow}>{locked ? <Ionicons name="lock-closed" size={10} color="#B8A895" /> : !g.inventoryId && <MaterialCommunityIcons name="circle-multiple" size={10} color="#D5B581" />}<Text style={s.price}>{locked ? 'Level ' + g.minLevel : g.inventoryId ? 'Owned ×' + g.count : g.cost.toLocaleString()}</Text></View>
+          {!!g.expiresAt && <Text style={s.expiry}>{Math.max(0, Math.ceil((Date.parse(g.expiresAt) - Date.now()) / 86400000))} days left</Text>}
+        </Pressable>;
+      })}
+      {!items.length && <View style={[s.center, { width: '100%', padding: 24 }]}><Ionicons name={category === 'Parcel' ? 'cube-outline' : 'search-outline'} size={28} color="#807684" /><Text style={s.white}>{category === 'Parcel' ? 'Your parcel is empty' : 'No gifts found'}</Text><Text style={s.subtle}>{category === 'Parcel' ? 'Saved gifts will appear here.' : 'Try a different name.'}</Text>{category === 'Parcel' && user.demo && <Action title="Try a sample parcel" disabled={busy} onPress={() => run(async () => setInventory(await api('/me/gift-inventory/demo', 'POST', {})))} />}</View>}
+    </ScrollView>}
+    {!!error && <Text accessibilityRole="alert" style={s.error}>{error}</Text>}{!!info && <View style={s.successRow}><Ionicons name="checkmark-circle" size={14} color="#A7CBB0" /><Text style={s.success}>{info}</Text></View>}
+    {selected && <View style={s.selectionSummary}><GiftArtwork id={selected.id} size={34} color={custom?.color} /><View style={{ flex: 1, gap: 2 }}><Text numberOfLines={1} style={s.summaryTitle}>{displayName}</Text><Text numberOfLines={1} style={s.subtle}>{owned ? 'From your parcel' : `${quantity} gift${quantity > 1 ? 's' : ''} · ${total.toLocaleString()} test coins`}</Text></View>{(user.level || 1) < selected.minLevel && <Text style={s.subtle}>Level {selected.minLevel}</Text>}</View>}
+    <View style={[s.footer, width < 360 && { paddingHorizontal: 14, gap: 6 }]}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Buy diamonds" onPress={openRecharge} style={s.wallet}><View style={s.walletAmount}><MaterialCommunityIcons name="circle-multiple" size={16} color="#DABD8B" /><Text style={s.balance}>{(user.coins || 0).toLocaleString()}</Text><Ionicons name="add-circle-outline" size={15} color="#948997" /></View><Text style={s.walletCaption}>TEST COINS</Text></Pressable>
+      <View style={{ flex: 1 }} />
+      <Pressable accessibilityRole="button" accessibilityLabel={`Gift quantity ${quantity}`} onPress={() => setQuantityOpen(!quantityOpen)} style={s.quantity}><Text style={s.white}>×{quantity}</Text><Ionicons name="chevron-down" size={12} color="#AE9CA6" /></Pressable>
+      {selected?.customizable && custom && <Pressable accessibilityRole="button" accessibilityLabel="Edit custom gift" onPress={customize} style={s.edit}><Ionicons name="create-outline" size={18} color="#D1B694" /></Pressable>}
+      <Action compact={width < 360} title={busy ? 'Sending…' : selected?.customizable && !custom ? 'Personalize' : 'Send gift'} disabled={busy || !selected || !recipient || (user.level || 1) < (selected?.minLevel || 1) || !!owned && quantity > owned.quantity} onPress={selected?.customizable && !custom ? customize : send} />
+    </View>
+    {quantityOpen && <View style={[s.quantityMenu, { bottom: bottom + 66 }]}><Text style={s.quantityLabel}>HOW MANY?</Text><View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>{[1, 5, 10, 20, 50, 99, 100, 520, 999].map(n => <Pressable accessibilityRole="button" accessibilityLabel={`Quantity ${n}`} key={n} onPress={() => { setQuantity(n); setQuantityOpen(false); }} style={[s.quantityChoice, n === quantity && { backgroundColor: '#E0BB8720' }]}><Text style={{ color: n === quantity ? '#EBCB9F' : '#D8CDD7', fontSize: 13 }}>×{n}</Text></Pressable>)}</View></View>}
+    <Modal transparent visible={!!overlay} animationType="fade" onRequestClose={() => overlay === 'broadcast' ? closeIntro() : setOverlay('')}>
+      <View style={s.backdrop}><ScrollView bounces={false} keyboardShouldPersistTaps="handled" style={{ maxHeight: height * .86, width: '100%', maxWidth: 400 }} contentContainerStyle={s.modal}>
+        <View style={s.modalTop}><Text style={s.heading}>{overlay === 'broadcast' ? 'A gift worth celebrating.' : overlay === 'custom' ? 'Make it personal.' : 'Your wallet'}</Text><Pressable accessibilityRole="button" accessibilityLabel="Close dialog" onPress={() => overlay === 'broadcast' ? closeIntro() : setOverlay('')} style={s.close}><Ionicons name="close" size={18} color="#B5AFBD" /></Pressable></View>
+        {overlay === 'broadcast' && <><View style={{ alignItems: 'center' }}><GiftArtwork id="floral-gift-box" size={130} /></View><Text style={s.modalBody}>Some moments deserve a bigger audience.</Text><Text style={s.modalNote}>Gifts worth more than 60,000 test coins appear in a celebration across rooms. Every gift starts with choosing someone.</Text><Action title="Find their gift" onPress={closeIntro} /></>}
+        {overlay === 'recharge' && <>{!recharge ? <><ActivityIndicator color="#E2BD87" /><Text style={s.white}>{error || 'Checking your wallet…'}</Text><Action title="Try again" onPress={openRecharge} disabled={busy} /></> : <><View style={{ alignItems: 'center' }}><GiftArtwork id="diamond-frame" size={115} /></View><Text style={s.modalBody}>{recharge.message}</Text><Text style={s.modalNote}>Region: {recharge.region}. Real payments are currently unavailable.</Text><Pressable accessibilityRole="checkbox" accessibilityState={{ checked: agreed }} onPress={() => setAgreed(!agreed)} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 9 }}><Ionicons name={agreed ? 'checkbox' : 'square-outline'} size={20} color="#D9B989" /><Text style={[s.modalNote, { flex: 1 }]}>I understand: {recharge.agreement}</Text></Pressable><Action title="Open test wallet" disabled={!agreed} onPress={() => { setOverlay(''); onClose(); onWallet(); }} /></>}</>}
+        {overlay === 'custom' && <><View style={s.previewStage}><GiftArtwork id={selected?.id} size={120} label={label} color={color} /></View><View style={{ gap: 6 }}><Text style={s.fieldLabel}>GIFT NAME</Text><TextInput accessibilityLabel="Gift label" value={label} onChangeText={setLabel} maxLength={24} style={s.input} placeholder="A name that means something" placeholderTextColor="#807784" /></View><View style={{ gap: 6 }}><Text style={s.fieldLabel}>YOUR NOTE <Text style={{ fontWeight: '400' }}>· optional</Text></Text><TextInput accessibilityLabel="Gift message" value={message} onChangeText={setMessage} maxLength={80} style={s.input} placeholder="A little note, just for them" placeholderTextColor="#807784" /></View><View style={s.swatches}>{[['gold','#D9BA84'],['pink','#D99CAD'],['blue','#94BDCF'],['purple','#B09AD2']].map(([v,tint]) => <Pressable accessibilityRole="radio" accessibilityLabel={`${v} finish`} accessibilityState={{ selected: color === v }} key={v} onPress={() => setColor(v)} style={[s.swatchRing, color === v && { borderColor: tint }]}><View style={[s.swatch, { backgroundColor: tint }]}>{color === v && <Ionicons name="checkmark" size={14} color="#302317" />}</View></Pressable>)}</View>{!!error && <Text style={s.error}>{error}</Text>}<Action title={busy ? 'Saving…' : 'Save personal touch'} disabled={!label.trim() || busy} onPress={() => run(async () => { const data = await api('/me/custom-gifts', 'POST', { giftId: selected!.id, label, message, color }); setCustoms(prev => [...prev.filter(g => g.giftId !== data.giftId), data]); setOverlay(''); setInfo('Your design is saved. Ready when you are.'); })} /></>}
+      </ScrollView></View>
+    </Modal>
+  </View>;
+}
+const s = StyleSheet.create({
+  drawer: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#1C1923', borderTopLeftRadius: 26, borderTopRightRadius: 26, borderTopWidth: 1, borderColor: '#48404D', overflow: 'hidden' },
+  handle: { width: 32, height: 3, borderRadius: 2, backgroundColor: '#6A606E', alignSelf: 'center', marginTop: 8 },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingTop: 10, paddingBottom: 8 }, heading: { color: '#F8F0E8', fontSize: 20, fontWeight: '600', letterSpacing: -.4, flexShrink: 1 }, white: { color: '#E3D8DF', fontSize: 13 }, subtle: { color: '#A298A8', fontSize: 11, lineHeight: 16 }, close: { padding: 8, borderRadius: 20, backgroundColor: '#FFFFFF06' },
+  recipientRow: { paddingHorizontal: 18, gap: 7, alignItems: 'center', paddingVertical: 6 }, recipient: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4, paddingLeft: 4, paddingRight: 9, borderRadius: 20, borderWidth: 1, borderColor: '#39313F' }, activeChip: { borderColor: '#9B7B55', backgroundColor: '#D8B67F12' }, avatar: { width: 23, height: 23, borderRadius: 12, backgroundColor: '#564659' }, initial: { width: 23, height: 23, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#564659' }, recipientText: { color: '#AAA0AF', fontSize: 11, maxWidth: 95 }, tab: { paddingTop: 11, paddingBottom: 10, borderBottomWidth: 2, borderColor: 'transparent' }, tabOn: { borderColor: '#E4C395' }, tabLabel: { color: '#93899B', fontSize: 12, fontWeight: '500' }, tabText: { color: '#F0D4AE', fontWeight: '700' },
+  searchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 5 }, searchField: { flexDirection: 'row', flex: 1, gap: 7, alignItems: 'center', paddingHorizontal: 10, backgroundColor: '#27222F', borderRadius: 8, borderWidth: .5, borderColor: '#3D3445' }, search: { flex: 1, minWidth: 0, color: '#EFE4ED', paddingVertical: 7, fontSize: 12 }, sort: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingVertical: 7 }, promo: { flexDirection: 'row', gap: 7, alignItems: 'center', backgroundColor: '#CC9D5C0C', paddingVertical: 7, paddingHorizontal: 18 }, promoText: { color: '#BEAA91', fontSize: 10, flex: 1 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 10, paddingVertical: 8, paddingBottom: 12 }, card: { width: '25%', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3, paddingTop: 7, paddingBottom: 10, borderWidth: 1, borderColor: 'transparent', borderRadius: 11, minHeight: 125 }, selected: { borderColor: '#B8925D', backgroundColor: '#BE925516' }, giftName: { color: '#D8CBD7', fontSize: 10, fontWeight: '500', lineHeight: 13, textAlign: 'center', height: 27, marginTop: 1 }, priceRow: { flexDirection: 'row', gap: 3, alignItems: 'center', marginTop: 4 }, price: { fontVariant: ['tabular-nums'], color: '#C6B7A5', fontSize: 10, fontWeight: '500' }, expiry: { color: '#9D8B96', fontSize: 9, marginTop: 2 }, badge: { color: '#D0A4AD', fontSize: 7, letterSpacing: .7, fontWeight: '700', position: 'absolute', right: 5, top: 3, zIndex: 1 }, check: { position: 'absolute', top: 5, right: 5, zIndex: 1, height: 15, width: 15, borderRadius: 8, backgroundColor: '#DDBB86', alignItems: 'center', justifyContent: 'center' },
+  selectionSummary: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 16, paddingVertical: 4, backgroundColor: '#FFFFFF03', borderTopWidth: .5, borderTopColor: '#3D3342' }, summaryTitle: { color: '#E1D1C4', fontSize: 11, fontWeight: '600' }, footer: { flexDirection: 'row', gap: 8, paddingHorizontal: 18, paddingTop: 10, paddingBottom: 3, alignItems: 'center', borderTopWidth: .5, borderTopColor: '#3D3342', minHeight: 57 }, wallet: { gap: 3 }, walletAmount: { flexDirection: 'row', alignItems: 'center', gap: 6 }, balance: { fontVariant: ['tabular-nums'], color: '#E7DCCF', fontSize: 15, fontWeight: '600' }, walletCaption: { color: '#807487', fontSize: 8, letterSpacing: 1.2, marginLeft: 22 }, action: { backgroundColor: '#E4C295', paddingHorizontal: 19, paddingVertical: 11, borderRadius: 9, alignItems: 'center' }, quantity: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 10, paddingHorizontal: 10, borderWidth: 1, borderColor: '#4A3D50', borderRadius: 8 }, edit: { paddingVertical: 8, paddingHorizontal: 2 }, quantityMenu: { position: 'absolute', right: 84, width: 189, backgroundColor: '#302735', padding: 7, borderRadius: 14, borderWidth: 1, borderColor: '#5D4961', shadowColor: '#000', shadowOpacity: .3, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } }, quantityLabel: { color: '#AF99AE', fontSize: 9, letterSpacing: 1.4, padding: 7 }, quantityChoice: { paddingVertical: 11, width: '33.33%', alignItems: 'center', borderRadius: 6 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 }, error: { color: '#F0AFB5', fontSize: 11, padding: 8, backgroundColor: '#B4555D14' }, successRow: { flexDirection: 'row', gap: 6, alignItems: 'center', paddingHorizontal: 16, paddingVertical: 7, backgroundColor: '#8EAD8910' }, success: { color: '#B4C6AD', fontSize: 11, flex: 1 }, backdrop: { flex: 1, backgroundColor: '#08060DE0', alignItems: 'center', justifyContent: 'center', padding: 22 }, modal: { backgroundColor: '#241D2B', borderWidth: .5, borderColor: '#66516B', borderRadius: 22, padding: 22, gap: 18 }, modalTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }, modalBody: { color: '#EADCD8', fontSize: 14, lineHeight: 21 }, modalNote: { color: '#AD9DAF', fontSize: 12, lineHeight: 19 }, previewStage: { alignItems: 'center', backgroundColor: '#33263B', borderRadius: 15, padding: 12 }, fieldLabel: { color: '#A994AA', fontSize: 9, fontWeight: '600', letterSpacing: 1.1 }, input: { color: '#F0E1E8', backgroundColor: '#302636', borderWidth: .5, borderColor: '#53405B', borderRadius: 8, padding: 12, fontSize: 13 }, swatches: { flexDirection: 'row', gap: 12, alignItems: 'center' }, swatchRing: { width: 35, height: 35, borderRadius: 18, borderWidth: 1, borderColor: 'transparent', alignItems: 'center', justifyContent: 'center' }, swatch: { width: 25, height: 25, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+});

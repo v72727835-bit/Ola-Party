@@ -117,7 +117,7 @@ export function seedState(hashPassword: (p: string) => string, secret: () => str
   const seededRooms = rooms.map((r, i) => ({
     id: `room-${i + 1}`, code: String(80080000 + i * 137 + 11), title: r.title, description: r.description, notice: r.notice, category: r.category,
     cover: users[r.owner].photo, theme: ['galaxy', 'sunset', 'ocean', 'forest', 'royal', 'midnight'][i % 6], admins: [id(r.members[1])], ownerId: id(r.owner), members: r.members.map(id),
-    seats: Array.from({ length: 8 }, (_, index) => ({ index, userId: r.seated[index] !== undefined ? id(r.seated[index]) : null, muted: false, locked: false })),
+    seats: Array.from({ length: 12 }, (_, index) => ({ index, userId: r.seated[index] !== undefined ? id(r.seated[index]) : null, muted: false, locked: false })),
     locked: false, password: null, demo: true,
   }));
   const messages = roomChat.map(([room, from, text], i) => ({ id: `seed-msg-${i + 1}`, roomId: `room-${room + 1}`, fromId: id(from), author: pub(from), text, createdAt: ago(120 - i * 3) }));

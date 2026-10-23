@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="gold" x1=".1" y1="0" x2=".9" y2="1"><stop stop-color="#FFF3C8"/><stop offset=".24" stop-color="#E3BC71"/><stop offset=".46" stop-color="#F5D68F"/><stop offset=".72" stop-color="#B27A37"/><stop offset="1" stop-color="#E7C17B"/></linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF4F0"/><stop offset=".28" stop-color="#EF7D9C"/><stop offset="1" stop-color="#B53164"/></linearGradient>
+    <linearGradient id="soft" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#FFF4F0"/><stop offset="1" stop-color="#F7C5C9"/></linearGradient>
+    <linearGradient id="petal" x1=".15" y1="0" x2=".8" y2="1"><stop stop-color="#FFE0E0"/><stop offset=".24" stop-color="#F299B0"/><stop offset=".68" stop-color="#CF527C"/><stop offset="1" stop-color="#96365C"/></linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A1D0A9"/><stop offset="1" stop-color="#286D58"/></linearGradient>
+    <linearGradient id="ivory" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFCF3"/><stop offset=".6" stop-color="#F4E3D7"/><stop offset="1" stop-color="#C5A7BB"/></linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E5FBFF"/><stop offset=".36" stop-color="#AAD7E4"/><stop offset=".7" stop-color="#7799BA"/><stop offset="1" stop-color="#D7EDF5"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#090611" flood-opacity=".26"/></filter>
+  </defs>
+  <g filter="url(#shadow)"><g transform="translate(100 82) rotate(-33)"><circle cx="0" cy="0" r="30" fill="none" stroke="#A76B27" stroke-width="17"/><circle cx="0" cy="-2" r="30" fill="none" stroke="url(#gold)" stroke-width="12"/><rect x="-7" y="27" width="14" height="87" rx="3" fill="url(#gold)" /><path d="M0 76L27 76L27 91L11 91L11 107L-1 107Z" fill="url(#gold)" /><g transform="translate(0 -1)"><path d="M0 -14L14 -3.5L8.4 11.200000000000001L-8.4 11.200000000000001L-14 -3.5Z" fill="url(#body)" /><path d="M0 -14L4.2 0L0 11.200000000000001L-5.6000000000000005 0Z" fill="#FFFFFF85" /><path d="M-9.799999999999999 -2.8000000000000003L9.799999999999999 -2.8000000000000003" fill="none" stroke="#FFFFFF88" stroke-width="1" stroke-linecap="round"/></g></g></g><path d="M48 69Q49 73 53 74Q49 75 48 79Q47 75 43 74Q47 73 48 69" fill="#EDD5AB" /><circle cx="190" cy="165" r="2.5" fill="#DEC3A0" /></svg>

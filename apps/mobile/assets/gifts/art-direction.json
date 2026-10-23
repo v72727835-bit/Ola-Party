@@ -1,0 +1,894 @@
+{
+  "version": 1,
+  "style": "Illustrated keepsakes: satin colors, brushed gold, ivory highlights; no text or emoji glyphs.",
+  "gifts": {
+    "flower-envelope": {
+      "motif": "envelope",
+      "palette": "rose"
+    },
+    "paper-plane-bouquet": {
+      "motif": "plane",
+      "palette": "rose"
+    },
+    "floral-gift-box": {
+      "motif": "box",
+      "palette": "rose"
+    },
+    "flower-bicycle": {
+      "motif": "bicycle",
+      "palette": "rose"
+    },
+    "wing-bottle": {
+      "motif": "bottle",
+      "palette": "rose"
+    },
+    "glass-heart-box": {
+      "motif": "heartbox",
+      "palette": "rose"
+    },
+    "moon-bell": {
+      "motif": "bell",
+      "palette": "ocean"
+    },
+    "firework-cruise": {
+      "motif": "ship",
+      "palette": "rose"
+    },
+    "magic-wheel": {
+      "motif": "wheel",
+      "palette": "lavender"
+    },
+    "the-holy-grail": {
+      "motif": "grail",
+      "palette": "gold"
+    },
+    "magic-gift-box": {
+      "motif": "box",
+      "palette": "lavender"
+    },
+    "magic-bottle": {
+      "motif": "bottle",
+      "palette": "lavender"
+    },
+    "star-crown": {
+      "motif": "crown",
+      "palette": "gold"
+    },
+    "gold-trophy": {
+      "motif": "trophy",
+      "palette": "gold"
+    },
+    "cloud-divine": {
+      "motif": "planet",
+      "palette": "ocean"
+    },
+    "golden-superior": {
+      "motif": "castle",
+      "palette": "gold"
+    },
+    "golden-pinnacle": {
+      "motif": "castle",
+      "palette": "gold"
+    },
+    "neon-groove": {
+      "motif": "music",
+      "palette": "lavender"
+    },
+    "heart": {
+      "motif": "heart",
+      "palette": "rose"
+    },
+    "big-eye-cat": {
+      "motif": "cat-eyes",
+      "palette": "rose"
+    },
+    "cute-pet-girl": {
+      "motif": "bow-cat",
+      "palette": "rose"
+    },
+    "magic-kitten": {
+      "motif": "animal",
+      "palette": "lavender"
+    },
+    "landmine": {
+      "motif": "firework",
+      "palette": "rose"
+    },
+    "favorite-hug": {
+      "motif": "hug",
+      "palette": "rose"
+    },
+    "lucky-pocket": {
+      "motif": "purse",
+      "palette": "rose"
+    },
+    "colors-of-india": {
+      "motif": "lotus",
+      "palette": "rose"
+    },
+    "motor-boat": {
+      "motif": "ship",
+      "palette": "ocean"
+    },
+    "rose": {
+      "motif": "flower",
+      "palette": "rose"
+    },
+    "cupid-arrow": {
+      "motif": "arrow",
+      "palette": "rose"
+    },
+    "letter-balloon": {
+      "motif": "envelope",
+      "palette": "rose"
+    },
+    "love-charger": {
+      "motif": "charger",
+      "palette": "rose"
+    },
+    "garden": {
+      "motif": "flower",
+      "palette": "mint"
+    },
+    "love-castle": {
+      "motif": "castle",
+      "palette": "rose"
+    },
+    "marry-me": {
+      "motif": "ring",
+      "palette": "rose"
+    },
+    "fantasy-castle": {
+      "motif": "castle",
+      "palette": "rose"
+    },
+    "bounty-time": {
+      "motif": "hourglass",
+      "palette": "rose"
+    },
+    "kiss": {
+      "motif": "lips",
+      "palette": "rose"
+    },
+    "doughnut": {
+      "motif": "doughnut",
+      "palette": "rose"
+    },
+    "fruity-ice-cream": {
+      "motif": "icecream",
+      "palette": "ocean"
+    },
+    "orange-juice": {
+      "motif": "cup",
+      "palette": "ocean"
+    },
+    "lolly-ice-pop": {
+      "motif": "lollipop",
+      "palette": "ocean"
+    },
+    "tea-time": {
+      "motif": "cup",
+      "palette": "rose"
+    },
+    "vip-ticket": {
+      "motif": "book",
+      "palette": "rose"
+    },
+    "carousel": {
+      "motif": "carousel",
+      "palette": "rose"
+    },
+    "party-carnival": {
+      "motif": "cake",
+      "palette": "rose"
+    },
+    "dessert-cart": {
+      "motif": "cake",
+      "palette": "rose"
+    },
+    "lollipop": {
+      "motif": "lollipop",
+      "palette": "rose"
+    },
+    "red-lips": {
+      "motif": "lips",
+      "palette": "rose"
+    },
+    "firework": {
+      "motif": "firework",
+      "palette": "rose"
+    },
+    "chandelier": {
+      "motif": "chandelier",
+      "palette": "rose"
+    },
+    "romantic-mask": {
+      "motif": "mask",
+      "palette": "rose"
+    },
+    "necklace": {
+      "motif": "ring",
+      "palette": "rose"
+    },
+    "castle": {
+      "motif": "castle",
+      "palette": "rose"
+    },
+    "barrel": {
+      "motif": "cup",
+      "palette": "rose"
+    },
+    "happy-birthday": {
+      "motif": "cake",
+      "palette": "rose"
+    },
+    "small-house": {
+      "motif": "house",
+      "palette": "rose"
+    },
+    "golden-boot": {
+      "motif": "shoe",
+      "palette": "gold"
+    },
+    "elf-magic-book": {
+      "motif": "book",
+      "palette": "lavender"
+    },
+    "bubble-camera": {
+      "motif": "camera",
+      "palette": "rose"
+    },
+    "sofa": {
+      "motif": "sofa",
+      "palette": "rose"
+    },
+    "scepter": {
+      "motif": "scepter",
+      "palette": "rose"
+    },
+    "sports-car": {
+      "motif": "car",
+      "palette": "rose"
+    },
+    "romantic-fire": {
+      "motif": "firework",
+      "palette": "rose"
+    },
+    "wing-of-defender": {
+      "motif": "bird",
+      "palette": "rose"
+    },
+    "stage": {
+      "motif": "stage",
+      "palette": "rose"
+    },
+    "magic-cube": {
+      "motif": "box",
+      "palette": "lavender"
+    },
+    "magic-carpet": {
+      "motif": "carpet",
+      "palette": "lavender"
+    },
+    "super-sports-car": {
+      "motif": "car",
+      "palette": "rose"
+    },
+    "snowflake": {
+      "motif": "snowflake",
+      "palette": "ocean"
+    },
+    "musical-beats": {
+      "motif": "music",
+      "palette": "rose"
+    },
+    "flying": {
+      "motif": "bird",
+      "palette": "rose"
+    },
+    "kiss-kiss": {
+      "motif": "lips",
+      "palette": "rose"
+    },
+    "roses-bloom": {
+      "motif": "flower",
+      "palette": "rose"
+    },
+    "face-kiss": {
+      "motif": "lips",
+      "palette": "rose"
+    },
+    "peacock": {
+      "motif": "peacock",
+      "palette": "mint"
+    },
+    "swan": {
+      "motif": "bird",
+      "palette": "rose"
+    },
+    "flying-cupid-arrow": {
+      "motif": "arrow",
+      "palette": "rose"
+    },
+    "stellar-ring-box": {
+      "motif": "ringbox",
+      "palette": "rose"
+    },
+    "starlit-ring": {
+      "motif": "ring",
+      "palette": "lavender"
+    },
+    "normal-golden-box": {
+      "motif": "box",
+      "palette": "gold"
+    },
+    "deluxe-golden-box": {
+      "motif": "box",
+      "palette": "gold"
+    },
+    "basic-magic-box": {
+      "motif": "box",
+      "palette": "lavender"
+    },
+    "advanced-magic-box": {
+      "motif": "box",
+      "palette": "lavender"
+    },
+    "enchantress": {
+      "motif": "crystal",
+      "palette": "rose"
+    },
+    "magic-green-crystal": {
+      "motif": "crystal",
+      "palette": "ocean"
+    },
+    "magic-blue-crystal": {
+      "motif": "crystal",
+      "palette": "ocean"
+    },
+    "magic-golden-crystal": {
+      "motif": "crystal",
+      "palette": "gold"
+    },
+    "magic-purple-crystal": {
+      "motif": "crystal",
+      "palette": "ocean"
+    },
+    "common-chest": {
+      "motif": "chest",
+      "palette": "rose"
+    },
+    "rare-chest": {
+      "motif": "chest",
+      "palette": "rose"
+    },
+    "epic-chest": {
+      "motif": "chest",
+      "palette": "rose"
+    },
+    "legendary-chest": {
+      "motif": "chest",
+      "palette": "rose"
+    },
+    "bronze-key": {
+      "motif": "key",
+      "palette": "gold"
+    },
+    "silver-key": {
+      "motif": "key",
+      "palette": "rose"
+    },
+    "gold-key": {
+      "motif": "key",
+      "palette": "gold"
+    },
+    "crystal-key": {
+      "motif": "key",
+      "palette": "ocean"
+    },
+    "sweet-home": {
+      "motif": "house",
+      "palette": "rose"
+    },
+    "ship-of-friends": {
+      "motif": "ship",
+      "palette": "ocean"
+    },
+    "romantic-rose": {
+      "motif": "flower",
+      "palette": "rose"
+    },
+    "dreamy-unicorn": {
+      "motif": "unicorn",
+      "palette": "lavender"
+    },
+    "become-a-couple": {
+      "motif": "couple",
+      "palette": "rose"
+    },
+    "sweet-lollipop": {
+      "motif": "lollipop",
+      "palette": "rose"
+    },
+    "passionate-rose": {
+      "motif": "passionate-rose",
+      "palette": "rose"
+    },
+    "love-cotton-candy": {
+      "motif": "lollipop",
+      "palette": "rose"
+    },
+    "heart-of-beach": {
+      "motif": "planet",
+      "palette": "rose"
+    },
+    "pink-ice-cream": {
+      "motif": "icecream",
+      "palette": "ocean"
+    },
+    "ocean-of-love": {
+      "motif": "planet",
+      "palette": "ocean"
+    },
+    "pink-diary": {
+      "motif": "book",
+      "palette": "rose"
+    },
+    "kiss-with-me": {
+      "motif": "lips",
+      "palette": "rose"
+    },
+    "dream-planet": {
+      "motif": "planet",
+      "palette": "lavender"
+    },
+    "love-of-flames": {
+      "motif": "flame-heart",
+      "palette": "rose"
+    },
+    "confession-balloon": {
+      "motif": "balloon",
+      "palette": "rose"
+    },
+    "valentine-ring": {
+      "motif": "ring",
+      "palette": "rose"
+    },
+    "rose-cake": {
+      "motif": "cake",
+      "palette": "rose"
+    },
+    "crystal-ball": {
+      "motif": "orb",
+      "palette": "ocean"
+    },
+    "pink-lock": {
+      "motif": "lock",
+      "palette": "rose"
+    },
+    "love-heart": {
+      "motif": "heart-pendant",
+      "palette": "rose"
+    },
+    "rose-wine": {
+      "motif": "wine",
+      "palette": "rose"
+    },
+    "life-music": {
+      "motif": "music",
+      "palette": "rose"
+    },
+    "i-love-you": {
+      "motif": "heart-note",
+      "palette": "rose"
+    },
+    "unicorn": {
+      "motif": "unicorn",
+      "palette": "lavender"
+    },
+    "go-to-the-stars": {
+      "motif": "planet",
+      "palette": "lavender"
+    },
+    "heart-lunch-box": {
+      "motif": "box",
+      "palette": "rose"
+    },
+    "crystal-rose": {
+      "motif": "crystal",
+      "palette": "ocean"
+    },
+    "pink-carriage": {
+      "motif": "carriage",
+      "palette": "rose"
+    },
+    "frog-heart": {
+      "motif": "frog",
+      "palette": "rose"
+    },
+    "love-wedding": {
+      "motif": "cake",
+      "palette": "rose"
+    },
+    "rowing-ceremony": {
+      "motif": "ship",
+      "palette": "rose"
+    },
+    "romantic-bloom": {
+      "motif": "flower",
+      "palette": "rose"
+    },
+    "romantic-gift-planet": {
+      "motif": "planet",
+      "palette": "lavender"
+    },
+    "heart-planet": {
+      "motif": "planet",
+      "palette": "lavender"
+    },
+    "candy-jar": {
+      "motif": "jar",
+      "palette": "rose"
+    },
+    "pink-watering": {
+      "motif": "watering",
+      "palette": "rose"
+    },
+    "pink-balloon": {
+      "motif": "balloon",
+      "palette": "rose"
+    },
+    "pink-crown": {
+      "motif": "crown",
+      "palette": "gold"
+    },
+    "dreamcatcher": {
+      "motif": "animal",
+      "palette": "lavender"
+    },
+    "heart-to-heart": {
+      "motif": "heart-link",
+      "palette": "rose"
+    },
+    "carousel-love": {
+      "motif": "carousel",
+      "palette": "rose"
+    },
+    "go-to-the-future": {
+      "motif": "rocket",
+      "palette": "rose"
+    },
+    "pink-love-lock": {
+      "motif": "lock",
+      "palette": "rose"
+    },
+    "wind-chime": {
+      "motif": "bell",
+      "palette": "rose"
+    },
+    "music": {
+      "motif": "music",
+      "palette": "rose"
+    },
+    "pink-sword": {
+      "motif": "sword",
+      "palette": "rose"
+    },
+    "accompany": {
+      "motif": "paired-hearts",
+      "palette": "rose"
+    },
+    "love-umbrella": {
+      "motif": "umbrella",
+      "palette": "rose"
+    },
+    "diy-gift": {
+      "motif": "diy",
+      "palette": "rose"
+    },
+    "magical-fairy": {
+      "motif": "fairy",
+      "palette": "lavender"
+    },
+    "confession-letter": {
+      "motif": "envelope",
+      "palette": "rose"
+    },
+    "color-bomb": {
+      "motif": "firework",
+      "palette": "rose"
+    },
+    "love-balloon": {
+      "motif": "balloon",
+      "palette": "rose"
+    },
+    "wedding-bells": {
+      "motif": "bell",
+      "palette": "rose"
+    },
+    "heart-hands": {
+      "motif": "heartHands",
+      "palette": "rose"
+    },
+    "photograph": {
+      "motif": "camera",
+      "palette": "rose"
+    },
+    "pink-birds": {
+      "motif": "bird",
+      "palette": "rose"
+    },
+    "love-pigeon": {
+      "motif": "bird",
+      "palette": "rose"
+    },
+    "sweet-swan": {
+      "motif": "bird",
+      "palette": "rose"
+    },
+    "love-balance": {
+      "motif": "balance",
+      "palette": "rose"
+    },
+    "heart-wings": {
+      "motif": "heartWings",
+      "palette": "rose"
+    },
+    "heartbeat-test": {
+      "motif": "pulse",
+      "palette": "rose"
+    },
+    "dynamic-heart": {
+      "motif": "pulse-heart",
+      "palette": "rose"
+    },
+    "love-bouquet": {
+      "motif": "flower",
+      "palette": "rose"
+    },
+    "wings-of-heart": {
+      "motif": "heartWings",
+      "palette": "rose"
+    },
+    "rose-music-box": {
+      "motif": "box",
+      "palette": "rose"
+    },
+    "camping-light": {
+      "motif": "lamp",
+      "palette": "rose"
+    },
+    "love-song": {
+      "motif": "love-song",
+      "palette": "rose"
+    },
+    "fables-playing": {
+      "motif": "music",
+      "palette": "rose"
+    },
+    "sound-of-love": {
+      "motif": "radio",
+      "palette": "rose"
+    },
+    "love-rhythm": {
+      "motif": "rhythm",
+      "palette": "rose"
+    },
+    "romantic-album": {
+      "motif": "book",
+      "palette": "rose"
+    },
+    "pink-wedding": {
+      "motif": "cake",
+      "palette": "rose"
+    },
+    "romantic-opening": {
+      "motif": "box",
+      "palette": "rose"
+    },
+    "floating-roses": {
+      "motif": "floating-roses",
+      "palette": "rose"
+    },
+    "custom-royal-frame": {
+      "motif": "frame",
+      "palette": "gold"
+    },
+    "star-frame": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "golden-signature": {
+      "motif": "frame",
+      "palette": "gold"
+    },
+    "diamond-frame": {
+      "motif": "frame",
+      "palette": "ocean"
+    },
+    "starlight-portrait": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "ultra-celebration": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "custom-fame-gift": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "fame-portrait": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "champion-frame": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "fame-diamond": {
+      "motif": "frame",
+      "palette": "ocean"
+    },
+    "fame-spotlight": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "fame-celebration": {
+      "motif": "frame",
+      "palette": "lavender"
+    },
+    "cloudtop-castle": {
+      "motif": "castle",
+      "palette": "gold"
+    },
+    "lone-wolf": {
+      "motif": "animal",
+      "palette": "gold"
+    },
+    "desert-hawk": {
+      "motif": "bird",
+      "palette": "gold"
+    },
+    "woodland-champion": {
+      "motif": "animal",
+      "palette": "gold"
+    },
+    "gilded-lion": {
+      "motif": "animal",
+      "palette": "gold"
+    },
+    "skyfire-dragon": {
+      "motif": "dragon",
+      "palette": "gold"
+    },
+    "golden-sky-palace": {
+      "motif": "castle",
+      "palette": "gold"
+    },
+    "fantasy-wagon": {
+      "motif": "carriage",
+      "palette": "gold"
+    },
+    "luxury-carriage": {
+      "motif": "carriage",
+      "palette": "gold"
+    },
+    "sleek-sports-car": {
+      "motif": "car",
+      "palette": "gold"
+    },
+    "dream-yacht": {
+      "motif": "ship",
+      "palette": "gold"
+    },
+    "warrior-holy-shield": {
+      "motif": "sword",
+      "palette": "gold"
+    },
+    "crowning-king": {
+      "motif": "crown",
+      "palette": "gold"
+    },
+    "beach-house": {
+      "motif": "house",
+      "palette": "gold"
+    },
+    "fata-morgana": {
+      "motif": "castle",
+      "palette": "gold"
+    },
+    "magic-lamp": {
+      "motif": "lamp",
+      "palette": "gold"
+    },
+    "king-scepter": {
+      "motif": "scepter",
+      "palette": "gold"
+    },
+    "flower-crown": {
+      "motif": "crown",
+      "palette": "gold"
+    },
+    "phoenix": {
+      "motif": "bird",
+      "palette": "gold"
+    },
+    "vip-light-board": {
+      "motif": "lamp",
+      "palette": "gold"
+    },
+    "gold-mask": {
+      "motif": "mask",
+      "palette": "gold"
+    },
+    "vip-mount": {
+      "motif": "unicorn",
+      "palette": "gold"
+    },
+    "vip-night": {
+      "motif": "planet",
+      "palette": "gold"
+    },
+    "airy-kiss": {
+      "motif": "lips",
+      "palette": "rose"
+    },
+    "birthday-filter": {
+      "motif": "cake",
+      "palette": "rose"
+    },
+    "flowers-for-you": {
+      "motif": "flower",
+      "palette": "rose"
+    },
+    "demon": {
+      "motif": "mask",
+      "palette": "rose"
+    },
+    "angel": {
+      "motif": "angel",
+      "palette": "rose"
+    },
+    "sleepy-shiba-inu": {
+      "motif": "shiba",
+      "palette": "rose"
+    },
+    "morocco": {
+      "motif": "mask",
+      "palette": "rose"
+    },
+    "firecracker": {
+      "motif": "firework",
+      "palette": "rose"
+    },
+    "keyboard-cat": {
+      "motif": "cat-keyboard",
+      "palette": "rose"
+    },
+    "big-mouth-cat": {
+      "motif": "animal",
+      "palette": "rose"
+    },
+    "rain-fan-cat": {
+      "motif": "cat-umbrella",
+      "palette": "rose"
+    },
+    "crying-cat": {
+      "motif": "cat-tears",
+      "palette": "rose"
+    },
+    "like": {
+      "motif": "thumbs",
+      "palette": "rose"
+    },
+    "crown": {
+      "motif": "crown",
+      "palette": "gold"
+    },
+    "rocket": {
+      "motif": "rocket",
+      "palette": "rose"
+    }
+  }
+}
