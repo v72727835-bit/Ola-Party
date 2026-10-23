@@ -1,0 +1,42 @@
+/* Community console: quiet surfaces, one violet accent, readable live data. */
+:root { color-scheme: dark; font-family: 'DM Sans', system-ui, sans-serif; background: #100e17; color: #ece7f4; }
+body { background: #100e17; }
+aside { background: #15111f; border-right: 1px solid #ffffff0b; }
+.workspace { background: radial-gradient(ellipse at 75% 0%, #55377b16, transparent 45%), #100e17; }
+header { background: #15111fe8; border-bottom: 1px solid #ffffff0b; }
+.brandmark { background: linear-gradient(135deg, #b29be2, #72529e); }
+nav button { min-height: 44px; }
+nav button.selected { background: #a88bde1c; color: #d3b9ff; border: 1px solid #a88bde30; box-shadow: none; }
+.breadcrumb, .header-user, .page-heading p, p, small, .data-note, footer { color: #a49aae; }
+.breadcrumb strong, h1, h2, h3, .metric strong, td strong, .all-clear h3, .economy h3, .empty h3 { color: #eee8f5; }
+.eyebrow, .text-button { color: #bba0e5; }
+.metric, .room, .report, .all-clear, .table-wrap, .empty, .login-card { background: #1b1624; border-color: #ffffff10; box-shadow: 0 8px 28px #0000000b; }
+.metric { position: relative; overflow: hidden; }
+.metric::after { content: ''; position: absolute; width: 80px; height: 2px; left: 24px; top: 0; background: #a88bde66; }
+.metric .between > span, .room-footer, td, .login-card label { color: #b9afc4; }
+.metric small { color: #8f839f; }
+.purple, .person-avatar, .transaction-icon { background: #a88bde1c; color: #c4a8ed; }
+.pink { background: #e78eb51a; color: #e9a6c5; }.teal { background: #6ce1ba16; color: #80d7ba; }.orange { background: #e9c18a16; color: #dfba87; }
+.room { transition: border-color .18s, transform .18s; }.room:hover { border-color: #aa8cd24d; transform: translateY(-2px); }
+.room-art { height: 150px; }.room-tag { background: #16102088; backdrop-filter: blur(5px); }
+.room-footer, th, td, footer { border-color: #ffffff0b; }
+.badge, .economy .badge { background: #ad8bd51a; color: #c4abd9; }.warning { background: #e6b77919; color: #e6c08b; }
+.all-clear { color: #83cbb2; }.economy { background: linear-gradient(115deg, #292034, #1c1927); border-color: #b894df20; color: #b999df; }.economy p { color: #b4a4c4; }
+.search, .login-card input { background: #14101d; border-color: #ffffff20; color: #eee8f5; }
+.search input { color: #eee8f5; min-width: 0; width: 100%; }.search { min-width: 0; }
+th { background: #211a2b; color: #c1b3d1; }td { background: transparent; }
+.report-icon { background: #e7b77817; color: #e7bd85; }.status { color: #87d4b5; }.status.disabled { color: #eba8ae; }
+button, .secondary, .quiet { background: #a78bfa18; color: #d7c4f0; border: 1px solid #a88bde28; }
+button:hover { filter: none; background-color: #a78bfa28; }button:disabled { cursor: not-allowed; }
+.danger { background: #e4819215; color: #efb2bd; border-color: #e4819228; }.error { background: #e4819212; color: #f3b7bd; border-color: #e4819233; }
+.login { background: radial-gradient(ellipse at 20% 50%, #6d489331, transparent 50%), #100e17; }.login-brand h1 span { color: #bca0e5; }
+.login-card { border: 1px solid #ffffff12; }.login-card .primary { background: #b49ad8; color: #1a1225; }.login-card input { min-height: 44px; }
+.console-profile { display: inline-flex; align-items: center; gap: 10px; background: transparent; border-color: transparent; padding: 4px; }.console-profile [data-slot="avatar"] { background: #3c2c50; color: #dbc8f6; }
+.console-skeleton { padding: 24px; background: #1b1624; border: 1px solid #ffffff10; border-radius: 14px; margin: 18px 0; }.console-skeleton [data-slot="skeleton"] { background: #ffffff0d; }
+[data-slot="dialog-content"], [data-slot="dropdown-menu-content"], [data-slot="tooltip-content"] { color: #eee8f5; background: #21182e; border-color: #80669455; }
+[data-slot="dialog-content"] { width: calc(100% - 32px); max-width: 440px; padding: 26px; border-radius: 18px; }[data-slot="dialog-description"] { color: #bdb0ca; line-height: 1.7; }
+:focus-visible { outline: 2px solid #c5a5ff !important; outline-offset: 4px; }
+@media(max-width:700px) { .content { padding: 22px 16px; }.brand { white-space: nowrap; }.metric::after { left: 14px; }.console-profile > span.profile-label { display: none; }.report .between { gap: 8px; }.section-title h2 span { display: block; margin: 4px 0 0; }.login-card { padding: 24px; } }
+@media(prefers-reduced-motion:reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }.room:hover { transform: none; } }
+
+.brand { font-size: 18px; gap: 8px; white-space: nowrap; }.admin-word { font-size: 8px; }

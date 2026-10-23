@@ -1,6 +1,6 @@
 {
   "name": "party-app-mobile",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "main": "index.ts",
   "scripts": {
@@ -14,11 +14,14 @@
   },
   "dependencies": {
     "@config-plugins/react-native-webrtc": "^15.0.2",
+    "@expo/metro-runtime": "~57.0.17",
     "@expo/vector-icons": "^15.0.0",
     "@livekit/react-native": "^3.1.0",
     "@livekit/react-native-expo-plugin": "^1.1.0",
     "@livekit/react-native-webrtc": "^150.1.0",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
     "expo": "~57.0.30",
     "expo-constants": "~57.0.22",
     "expo-dev-client": "~57.0.20",
@@ -32,10 +35,12 @@
     "react-native": "^0.86.3",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-web": "^0.21.0",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@types/react": "~19.2.0",
+    "@types/three": "^0.180.0",
     "typescript": "~6.0.3"
   }
 }
