@@ -7,6 +7,7 @@ import { Item, MIcon } from '../types';
 import { AudioConnection, connectAudio } from '../../audio';
 import { API } from '../theme';
 import { rememberGifts } from '../../GiftDrawer';
+import { getBack } from '../navigation/routes';
 
 // All app state, socket wiring, effects and actions that used to live at the top of PartyApp.
 export function useAppState() {
@@ -73,7 +74,7 @@ export function useAppState() {
   const goHome = () => { navigate(''); setDm(null); };
   const featureButtons: { name: string; note: string; key: string; icon: MIcon; colors: [string, string] }[] = [{ name: 'Rankings', note: 'Top gifters', key: 'leaderboard', icon: 'crown', colors: ['#FFB21C', '#FF6A00'] }, { name: 'Events', note: 'This week', key: 'events', icon: 'calendar-star', colors: ['#FF2E74', '#C026D3'] }, { name: 'Families', note: 'Find your gang', key: 'families', icon: 'account-group', colors: ['#8B3DFF', '#3D7BFF'] }, { name: 'Rewards', note: 'Free coins', key: 'tasks', icon: 'gift', colors: ['#00B89C', '#0EA5E9'] }];
   const filteredRooms = rooms.filter(r => (category === 'All' || r.category?.toLowerCase() === category.toLowerCase()) && `${r.title} ${r.description} ${r.category} ${r.code || ''}`.toLowerCase().includes(q.toLowerCase()));
-  const back = page === 'gifts' && giftFromDm && dm ? () => { setGiftFromDm(false); navigate('dm'); } : page === 'room' ? () => navigate('') : room && ['games', 'game', 'pk', 'gifts', 'user', 'room-settings', 'queue', 'lucky'].includes(page) ? () => navigate('room') : goHome;
+  const back = getBack({ page, giftFromDm, dm, room, navigate, setGiftFromDm, goHome });
 
 
   const scrollRef = useRef<ScrollView>(null);
