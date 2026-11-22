@@ -1,0 +1,39 @@
+import React from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { s } from '../styles';
+import { Button, Coin, Field, Level, Photo } from '../components/ui';
+import { shortId } from '../utils';
+import { Item } from '../types';
+import { decoLook } from '../theme';
+import type { AppCtx } from '../state/context';
+
+export function renderEditProfile(ctx: AppCtx) {
+  const {
+    act, api, birthday, busy, description, gender, hometown, name, navigate, page, pickPhoto, refresh, setBirthday,
+    setDescription, setGender, setHometown, setName, setNotice, setTagsText, tagsText, user
+  } = ctx;
+  if (!(page === 'edit-profile')) return null;
+  return <View style={s.form}><View style={{ alignItems: 'center', gap: 10 }}><Pressable onPress={pickPhoto}><Photo uri={user?.photo} name={name || user?.name} size={96} ring /><View style={s.camBadge}><Ionicons name="camera" size={16} color="white" /></View></Pressable><Pressable onPress={pickPhoto}><Text style={s.link}>{user?.photo ? 'Change photo' : 'Add profile photo'}</Text></Pressable></View><Field label="Your name" value={name} onChangeText={setName} /><Field label="Bio" value={description} onChangeText={setDescription} multiline placeholder="Apne baare mein kuch likho..." /><Text style={s.label}>Gender</Text><View style={s.wrap}>{[['male', 'Male'], ['female', 'Female']].map(([v, l]) => <Pressable key={v} onPress={() => setGender(v)} style={[s.chip, gender === v && s.chipOn]}><Text style={[s.chipText, gender === v && { color: 'white' }]}>{l}</Text></Pressable>)}</View><Field label="Hometown" value={hometown} onChangeText={setHometown} placeholder="e.g. Varanasi" /><Field label="Birthday (YYYY-MM-DD)" value={birthday} onChangeText={setBirthday} placeholder="2001-04-12" /><Field label="Interests (comma se alag karo)" value={tagsText} onChangeText={setTagsText} placeholder="Music, Cricket, Shayari" /><Button title="Save profile" disabled={busy || !name.trim()} onPress={() => act(async () => { if (birthday && !/^\d{4}-\d{2}-\d{2}$/.test(birthday)) throw new Error('Birthday is format mein likho: 2001-04-12'); await api('/me', 'PATCH', { name, bio: description, hometown, birthday, ...(gender ? { gender } : {}), tags: tagsText.split(',').map(t => t.trim()).filter(Boolean).slice(0, 6) }); await refresh(); navigate(''); setNotice('Profile save ho gayi.'); })} /></View>;
+}
+
+export function renderUserProfile(ctx: AppCtx) {
+  const {
+    aboutRows, act, api, busy, description, enterRoom, following, goHome, honorGrid, isMod, navigate, openDm, page,
+    profile, room, rooms, seatAction, setDescription, setGiftFromDm, setNotice, setRecipient, setRoom,
+    toggleFollow, user
+  } = ctx;
+  if (!(page === 'user' && profile)) return null;
+  const isF = following.includes(profile.id);
+  const inR = rooms.find(rr => rr.members?.includes(profile.id));
+  return <><LinearGradient colors={['#FF2E74', '#8B3DFF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.hero, { alignItems: 'center' }]}><Photo uri={profile.photo} name={profile.name} size={92} ring ringColors={['#FFFFFF', '#FFE08A']} /><View style={[s.row, { marginTop: 8, flexWrap: 'wrap', justifyContent: 'center' }]}><Text style={s.heroTitle}>{profile.name}</Text><Level level={profile.level} gender={profile.gender} /></View><Text style={s.meId}>ID: {shortId(profile.id)}</Text><Text style={[s.heroSub, { textAlign: 'center' }]}>{profile.bio || 'Hey there!'}</Text><View style={[s.row, { gap: 26, marginTop: 8 }]}><View style={{ alignItems: 'center' }}><Text style={s.heroStat}>{profile.followers?.length ?? 0}</Text><Text style={s.heroSub}>Followers</Text></View><View style={{ alignItems: 'center' }}><Text style={s.heroStat}>{profile.following?.length ?? 0}</Text><Text style={s.heroSub}>Following</Text></View></View></LinearGradient><View style={[s.row, { gap: 10, marginVertical: 14 }]}><View style={{ flex: 1 }}><Button title={isF ? 'Following' : 'Follow'} soft={isF} onPress={() => toggleFollow(profile.id)} /></View><View style={{ flex: 1 }}><Button title="Message" soft onPress={() => openDm(profile)} /></View><View style={{ flex: 1 }}><Button title="Gift" onPress={() => { setRecipient(profile.id); setGiftFromDm(false); navigate('gifts'); }} /></View></View>{inR && <Pressable style={[s.listCard, s.msgRow, { paddingHorizontal: 14, borderBottomWidth: 0 }]} onPress={() => enterRoom(inR)}><Photo uri={inR.cover} name={inR.title} size={48} radius={12} /><View style={{ flex: 1 }}><Text style={s.tiny}>In room now</Text><Text style={s.menuText}>{inR.title}</Text></View><Text style={s.link}>Join</Text></Pressable>}<View style={[s.card, { marginTop: 10 }]}><Text style={[s.cardTitle, { marginBottom: 10 }]}>About</Text>{aboutRows(profile)}</View><Text style={[s.sectionTitle, { marginTop: 8, marginBottom: 8 }]}>Honor</Text>{honorGrid}{isMod && room?.members?.includes(profile.id) && profile.id !== room.ownerId && <View style={[s.card, { gap: 10, marginTop: 10 }]}><Text style={s.cardTitle}>Room controls</Text>{room.ownerId === user?.id && <Button small soft title={(room.admins || []).includes(profile.id) ? 'Remove admin' : 'Make admin'} onPress={() => act(async () => { setRoom(await api(`/rooms/${room.id}/admins`, 'POST', { userId: profile.id, admin: !(room.admins || []).includes(profile.id) })); setNotice('Done.'); })} />}{(() => { const seat = room.seats?.find((x: Item) => x.userId === profile.id); return seat ? <><Button small soft title={seat.muted ? 'Unmute mic' : 'Mute mic'} onPress={() => seatAction(seat.index, seat.muted ? 'unmute' : 'mute')} /><Button small soft title="Remove from seat" onPress={() => seatAction(seat.index, 'leave')} /></> : null; })()}<Button small soft title="Remove from room" onPress={() => act(async () => { await api(`/rooms/${room.id}/kick`, 'POST', { userId: profile.id }); setRoom(await api(`/rooms/${room.id}`)); navigate('room'); })} /></View>}<View style={[s.card, { gap: 12, marginTop: 10 }]}><Text style={s.cardTitle}>Safety</Text><Field label="Report reason" value={description} onChangeText={setDescription} multiline placeholder="Kya problem hui? Batao." /><Button title="Submit report" small soft disabled={busy || !description.trim()} onPress={() => act(async () => { await api('/reports', 'POST', { targetType: 'user', targetId: profile.id, reason: description }); setDescription(''); setNotice('Report mil gayi. Hum check karenge.'); })} /><Button title="Block this person" small soft onPress={() => act(async () => { await api(`/users/${profile.id}/block`, 'POST', {}); setNotice('Block kar diya.'); goHome(); })} /></View></>;
+}
+
+export function renderDecorations(ctx: AppCtx) {
+  const {
+    act, api, banners, busy, catalog, page, refresh, setCatalog
+  } = ctx;
+  if (!(page === 'decorations')) return null;
+  return <><Text style={s.bodyMuted}>Frames, entry effects aur badges. Profile ko alag dikhao.</Text><View style={s.listCard}>{catalog.decorations?.map((d, k) => <View key={d.id} style={[s.msgRow, k === (catalog.decorations?.length || 0) - 1 && { borderBottomWidth: 0 }]}><LinearGradient colors={banners[k % 3].colors} style={s.decoIcon}><MaterialCommunityIcons name={decoLook[d.slot] || 'star-circle'} size={28} color="white" /></LinearGradient><View style={{ flex: 1, gap: 3 }}><Text style={s.menuText}>{d.name}</Text><View style={s.row}><Text style={s.small}>{d.slot}</Text><Coin n={d.price} size={13} /></View></View><Button small title={d.equipped ? 'Remove' : d.owned ? 'Use' : 'Buy'} soft={d.owned} disabled={busy} onPress={() => act(async () => { const data = d.equipped ? await api(`/decorations/slot/${d.slot}`, 'DELETE', {}) : d.owned ? await api(`/decorations/${d.id}/equip`, 'POST', {}) : await api(`/decorations/${d.id}/buy`, 'POST', {}); setCatalog(prev => ({ ...prev, decorations: data.items })); await refresh(); })} /></View>)}</View></>;
+}

@@ -1,0 +1,83 @@
+import React from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import GameLounge from '../../GameLounge';
+import { s } from '../styles';
+import { Dice, LUDO, LUDO_SOFT, LudoBoard } from '../games/Ludo';
+import { UNO_COL, UnoCard } from '../games/UnoCard';
+import { Item } from '../types';
+import { Button, Heading, Photo } from '../components/ui';
+import { c } from '../theme';
+import { firstName } from '../utils';
+import type { AppCtx } from '../state/context';
+
+export function renderGameLounge(ctx: AppCtx) {
+  const {
+    act, api, busy, catalog, navigate, page, room, setGame, user
+  } = ctx;
+  if (!(page === 'games')) return null;
+  return <><GameLounge roomTitle={room?.title} members={room?.members?.length || 0} /><Pressable disabled={!room || busy} onPress={() => act(async () => { setGame(await api('/games/ludo', 'POST', { roomId: room?.id })); navigate('game'); })} style={{ marginTop: 14 }}><LinearGradient colors={['#263c35', '#182923']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.ludoCard}><View style={{ flex: 1, gap: 4 }}><Text style={s.ludoCardTitle}>Ludo</Text><Text style={s.ludoCardSub}>2 se 4 players. Friends ke saath ya computer ke saath khelo.</Text><View style={s.ludoCardBtn}><Text style={s.ludoCardBtnText}>New game</Text></View></View><Dice value={6} size={70} /></LinearGradient></Pressable><Pressable disabled={!room || busy} onPress={() => act(async () => { setGame(await api('/games/uno', 'POST', { roomId: room?.id })); navigate('game'); })} style={{ marginTop: 12 }}><LinearGradient colors={['#1D1238', '#3B1E7A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.ludoCard}><View style={{ flex: 1, gap: 4 }}><Text style={s.ludoCardTitle}>UNO</Text><Text style={s.ludoCardSub}>Rang ya number milao, sabse pehle cards khatam karo.</Text><View style={s.ludoCardBtn}><Text style={s.ludoCardBtnText}>New game</Text></View></View><View style={{ flexDirection: 'row' }}><View style={{ transform: [{ rotate: '-12deg' }] }}><UnoCard card={{ color: 'red', value: '7' }} w={44} /></View><View style={{ marginLeft: -16, transform: [{ rotate: '10deg' }] }}><UnoCard card={{ color: 'wild', value: 'wild4' }} w={44} /></View></View></LinearGradient></Pressable><View style={[s.row, { gap: 12, marginVertical: 14 }]}><Pressable style={{ flex: 1 }} disabled={!room || busy} onPress={() => act(async () => { setGame(await api('/games', 'POST', { roomId: room?.id })); navigate('game'); })}><LinearGradient colors={['#322646', '#211a30']} style={s.gameTile}><MaterialCommunityIcons name="pound" size={44} color="white" /><Text style={s.gameTileText}>Tic-tac-toe</Text></LinearGradient></Pressable><Pressable style={{ flex: 1 }} disabled={!room || busy} onPress={() => act(async () => { setGame(await api('/games/connect-four', 'POST', { roomId: room?.id })); navigate('game'); })}><LinearGradient colors={['#43342a', '#2c231d']} style={s.gameTile}><MaterialCommunityIcons name="dots-grid" size={44} color="white" /><Text style={s.gameTileText}>Connect Four</Text></LinearGradient></Pressable></View>{catalog.games?.filter(g => g.roomId === room?.id).length ? <Text accessibilityRole="header" style={{ color: '#eee8f5', fontSize: 19, fontWeight: '800', marginVertical: 14 }}>Games in this room</Text> : null}{catalog.games?.filter(g => g.roomId === room?.id).map(g => <View style={[s.card, s.row, { backgroundColor: '#211a2b', borderColor: '#ffffff18' }]} key={g.id}><View style={{ flex: 1 }}><Text style={[s.cardTitle, { color: '#eee8f5' }]}>{g.type === 'ludo' ? 'Ludo' : g.type === 'uno' ? 'UNO' : g.type === 'connect-four' ? 'Connect Four' : 'Tic-tac-toe'}</Text><Text style={[s.small, { color: '#b4a8c2' }]}>{g.players?.map((p: Item) => p.name).join(g.type === 'ludo' || g.type === 'uno' ? ', ' : ' vs ')} · {g.status === 'waiting' ? 'waiting for players' : g.status}</Text></View><Button small title={g.playerIds?.includes(user?.id) || g.status !== 'waiting' ? 'Open' : 'Join'} onPress={() => act(async () => { const joinPath = g.type === 'ludo' ? 'ludo-join' : g.type === 'uno' ? 'uno-join' : 'join'; setGame(g.playerIds?.includes(user?.id) || g.status !== 'waiting' ? g : await api(`/games/${g.id}/${joinPath}`, 'POST', {})); navigate('game'); })} /></View>)}</>;
+}
+
+export function renderLudoGame(ctx: AppCtx) {
+  const {
+    act, api, busy, game, page, setGame, user, width
+  } = ctx;
+  if (!(page === 'game' && game && game.type === 'ludo')) return null;
+  const players: Item[] = game.players || [];
+  const isHost = game.hostId === user?.id;
+  const inGame = game.playerIds?.includes(user?.id);
+  const myTurn = game.status === 'playing' && game.turn === user?.id;
+  const canRoll = myTurn && game.phase === 'roll';
+  const turnP = players.find(p => p.id === game.turn);
+  const winner = players.find(p => p.id === game.winnerId);
+  const ludoAct = (path: string, body: Item = {}) => act(async () => { setGame(await api(`/games/${game.id}/${path}`, 'POST', body)); });
+  const boardSize = Math.min(width, 520) - 28;
+  return game.status === 'waiting' ? <View style={s.form}><LinearGradient colors={['#E5484D', '#F2B705', '#1FA35B', '#2D7FF9']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.hero, { alignItems: 'center' }]}><Dice value={6} size={64} /><Text style={s.heroTitle}>Ludo</Text><Text style={[s.heroSub, { textAlign: 'center' }]}>6 aane par goti bahar niklegi. Jo pehle chaaron goti ghar pahuncha de, wo jeeta.</Text></LinearGradient><Heading title={`Players (${players.length}/4)`} /><View style={s.listCard}>{[0, 1, 2, 3].map(i => { const p = players[i]; return <View key={i} style={[s.msgRow, i === 3 && { borderBottomWidth: 0 }]}>{p ? <Photo uri={p.photo} name={p.name} size={44} /> : <View style={s.emptySlot}><Ionicons name="person-add-outline" size={20} color={c.faint} /></View>}<View style={{ flex: 1 }}><Text style={s.menuText}>{p ? (p.id === user?.id ? 'You' : p.name) : 'Waiting for player...'}</Text>{p && <Text style={s.tiny}>{p.bot ? 'Computer player' : p.id === game.hostId ? 'Host' : 'Player'}</Text>}</View></View>; })}</View>{!inGame && players.length < 4 && <Button title="Join game" disabled={busy} onPress={() => ludoAct('ludo-join')} />}{isHost && players.length < 4 && <Button title="Add computer player" soft disabled={busy} onPress={() => ludoAct('ludo-bot')} />}{isHost ? <Button title={players.length >= 2 ? 'Start game' : 'Kam se kam 2 players chahiye'} disabled={busy || players.length < 2} onPress={() => ludoAct('ludo-start')} /> : <Text style={[s.small, { textAlign: 'center' }]}>Host game shuru karega. Room ke dusre log bhi join kar sakte hain.</Text>}</View>
+    : <View style={{ gap: 12 }}><View style={s.ludoPlayers}>{players.map(p => { const col = game.colors?.[p.id]; const home = (game.tokens?.[p.id] || []).filter((x: number) => x === 56).length; const on = game.turn === p.id && game.status === 'playing'; return <View key={p.id} style={[s.ludoChip, { borderColor: on ? LUDO[col] : 'transparent', backgroundColor: on ? LUDO_SOFT[col] : 'white' }]}><View style={{ borderWidth: 2.5, borderColor: LUDO[col], borderRadius: 22 }}><Photo uri={p.photo} name={p.name} size={34} /></View><View style={{ flexShrink: 1 }}><Text style={s.ludoChipName} numberOfLines={1}>{p.id === user?.id ? 'You' : p.bot ? p.name : firstName(p.name)}</Text><Text style={s.tiny}>{home}/4 home</Text></View></View>; })}</View>
+      <LudoBoard g={game} me={user?.id} size={boardSize} onToken={i => ludoAct('ludo-move', { token: i })} />
+      <View style={s.ludoBar}><Pressable disabled={!canRoll || busy} onPress={() => ludoAct('roll')}><Dice value={game.dice} size={62} /></Pressable><View style={{ flex: 1, gap: 3 }}><Text style={s.cardTitle}>{game.status === 'finished' ? (game.winnerId === user?.id ? 'Aap jeet gaye!' : `${winner?.name || 'Player'} jeet gaye!`) : myTurn ? (game.phase === 'roll' ? 'Aapki baari. Dice roll karo.' : 'Chamakti goti par tap karo.') : `${turnP?.name || 'Player'} ki baari`}</Text>{!!game.log?.[0] && <Text style={s.small}>{game.log[0]}</Text>}</View>{canRoll && <Button small title="Roll" disabled={busy} onPress={() => ludoAct('roll')} />}</View>
+      {game.log?.length > 1 && <View style={s.infoBox}>{game.log.slice(1, 4).map((l: string, k: number) => <Text key={k} style={s.small}>{l}</Text>)}</View>}
+      {game.status === 'finished' && <Button title="New game" onPress={() => act(async () => { setGame(await api('/games/ludo', 'POST', { roomId: game.roomId })); })} />}
+    </View>;
+}
+
+export function renderUnoGame(ctx: AppCtx) {
+  const {
+    act, api, busy, game, page, pickColor, setGame, setPickColor, unoHand, user
+  } = ctx;
+  if (!(page === 'game' && game && game.type === 'uno')) return null;
+  const players: Item[] = game.players || [];
+  const isHost = game.hostId === user?.id;
+  const inGame = game.playerIds?.includes(user?.id);
+  const myTurn = game.status === 'playing' && game.turn === user?.id;
+  const turnP = players.find(p => p.id === game.turn);
+  const winner = players.find(p => p.id === game.winnerId);
+  const unoAct = (path: string, body: Item = {}) => act(async () => { setGame(await api(`/games/${game.id}/${path}`, 'POST', body)); setPickColor(null); });
+  return game.status === 'waiting' ? <View style={s.form}><LinearGradient colors={['#1D1238', '#3B1E7A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.hero, { alignItems: 'center' }]}><View style={{ flexDirection: 'row' }}><UnoCard card={{ color: 'blue', value: 'skip' }} w={48} /><View style={{ marginLeft: -14, transform: [{ rotate: '10deg' }] }}><UnoCard card={{ color: 'yellow', value: 'draw2' }} w={48} /></View></View><Text style={s.heroTitle}>UNO</Text><Text style={[s.heroSub, { textAlign: 'center' }]}>Har player ko 7 cards. Upar wale card ka rang ya number milao. Jo pehle saare cards khatam kare, wo jeeta.</Text></LinearGradient><Heading title={`Players (${players.length}/4)`} /><View style={s.listCard}>{[0, 1, 2, 3].map(i => { const p = players[i]; return <View key={i} style={[s.msgRow, i === 3 && { borderBottomWidth: 0 }]}>{p ? <Photo uri={p.photo} name={p.name} size={44} /> : <View style={s.emptySlot}><Ionicons name="person-add-outline" size={20} color={c.faint} /></View>}<View style={{ flex: 1 }}><Text style={s.menuText}>{p ? (p.id === user?.id ? 'You' : p.name) : 'Waiting for player...'}</Text>{p && <Text style={s.tiny}>{p.bot ? 'Computer player' : p.id === game.hostId ? 'Host' : 'Player'}</Text>}</View></View>; })}</View>{!inGame && players.length < 4 && <Button title="Join game" disabled={busy} onPress={() => unoAct('uno-join')} />}{isHost && players.length < 4 && <Button title="Add computer player" soft disabled={busy} onPress={() => unoAct('uno-bot')} />}{isHost ? <Button title={players.length >= 2 ? 'Start game' : 'Kam se kam 2 players chahiye'} disabled={busy || players.length < 2} onPress={() => unoAct('uno-start')} /> : <Text style={[s.small, { textAlign: 'center' }]}>Host game shuru karega.</Text>}</View>
+    : <View style={{ gap: 12 }}>
+      <View style={s.ludoPlayers}>{players.filter(p => p.id !== user?.id).map(p => { const on = game.turn === p.id && game.status === 'playing'; const n = game.counts?.[p.id] ?? 0; return <View key={p.id} style={[s.ludoChip, { borderColor: on ? c.brand : 'transparent', backgroundColor: on ? '#FFE8F0' : 'white' }]}><Photo uri={p.photo} name={p.name} size={36} /><View style={{ flexShrink: 1 }}><Text style={s.ludoChipName} numberOfLines={1}>{p.bot ? p.name : firstName(p.name)}</Text><Text style={[s.tiny, n === 1 && { color: c.red, fontWeight: '900' }]}>{n === 1 ? 'UNO! 1 card' : `${n} cards`}</Text></View></View>; })}</View>
+      <LinearGradient colors={['#0F5132', '#0B3D26']} style={s.unoTable}>
+        <View style={[s.row, { gap: 26, justifyContent: 'center' }]}>
+          <Pressable accessibilityLabel="Draw a card" disabled={!myTurn || game.phase !== 'play' || busy} onPress={() => unoAct('uno-draw')} style={{ alignItems: 'center', gap: 6 }}><UnoCard w={70} /><Text style={s.unoLabel}>{myTurn && game.phase === 'play' ? 'Tap to draw' : `${game.deckCount ?? ''} left`}</Text></Pressable>
+          <View style={{ alignItems: 'center', gap: 6 }}><UnoCard card={game.top} w={78} /><View style={s.row}><View style={[s.colorDot, { backgroundColor: UNO_COL[game.color] || '#999' }]} /><Ionicons name={game.direction === -1 ? 'arrow-undo' : 'arrow-redo'} size={18} color="white" /></View></View>
+        </View>
+        <Text style={s.unoStatus}>{game.status === 'finished' ? (game.winnerId === user?.id ? 'Aap jeet gaye!' : `${winner?.name || 'Player'} jeet gaye!`) : myTurn ? (game.phase === 'drawn' ? 'Nikla card chal sakte ho, ya Pass karo' : (unoHand.playable || []).length ? 'Aapki baari. Card chuno.' : 'Koi card match nahi. Deck se card lo.') : `${turnP?.name || 'Player'} ki baari`}</Text>
+        {!!game.log?.[0] && <Text style={s.unoLog}>{game.log[0]}</Text>}
+      </LinearGradient>
+      {pickColor && <View style={s.colorPick}><Text style={s.cardTitle}>Rang chuno</Text><View style={[s.row, { gap: 12 }]}>{['red', 'yellow', 'green', 'blue'].map(col => <Pressable key={col} accessibilityLabel={col} onPress={() => unoAct('uno-play', { card: pickColor, color: col })} style={[s.colorBig, { backgroundColor: UNO_COL[col] }]} />)}</View><Pressable onPress={() => setPickColor(null)}><Text style={s.link}>Cancel</Text></Pressable></View>}
+      {inGame && <><Text style={s.label}>Your cards ({unoHand.cards?.length || 0})</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingTop: 14, paddingBottom: 6, paddingRight: 10 }}>{(unoHand.cards || []).map((cd: Item) => { const ok = (unoHand.playable || []).includes(cd.id); return <Pressable key={cd.id} accessibilityLabel={`${cd.color} ${cd.value}`} disabled={!ok || busy} onPress={() => { if (cd.color === 'wild') setPickColor(cd.id); else unoAct('uno-play', { card: cd.id }); }}><UnoCard card={cd} w={62} lifted={ok} dim={myTurn && !ok} /></Pressable>; })}</ScrollView></>}
+      {myTurn && game.phase === 'drawn' && <Button title="Pass" soft disabled={busy} onPress={() => unoAct('uno-pass')} />}
+      {game.log?.length > 1 && <View style={s.infoBox}>{game.log.slice(1, 4).map((l: string, k: number) => <Text key={k} style={s.small}>{l}</Text>)}</View>}
+      {game.status === 'finished' && <Button title="New game" onPress={() => act(async () => { setGame(await api('/games/uno', 'POST', { roomId: game.roomId })); })} />}
+    </View>;
+}
+
+export function renderOtherGame(ctx: AppCtx) {
+  const {
+    act, api, busy, game, page, setGame, user
+  } = ctx;
+  if (!(page === 'game' && game && game.type !== 'ludo' && game.type !== 'uno')) return null;
+  return <View style={s.form}><Text style={s.sectionTitle}>{game.players?.map((p: Item) => p.name).join('  vs  ')}</Text><View style={s.statusPill}><Text style={s.statusText}>{game.status === 'waiting' ? 'Dusre player ka wait ho raha hai' : game.status === 'finished' ? game.winnerId === user?.id ? 'Aap jeet gaye!' : 'Game over. Achha khela!' : game.status === 'draw' ? 'Draw!' : game.turn === user?.id ? 'Aapki baari' : 'Dusre player ki baari'}</Text></View>{game.type === 'connect-four' ? <View style={s.c4Board}>{game.board?.map((mark: string | null, index: number) => <Pressable key={index} accessibilityLabel={`Column ${(index % 7) + 1}, ${mark ? (mark === 'R' ? 'red' : 'yellow') : 'empty'}`} disabled={busy || game.status !== 'playing' || game.turn !== user?.id} style={{ width: '12.4%', aspectRatio: 1, borderRadius: 99, backgroundColor: mark === 'R' ? c.red : mark === 'Y' ? c.gold : '#FFFFFF' }} onPress={() => act(async () => { setGame(await api(`/games/${game.id}/drop`, 'POST', { column: index % 7 })); })} />)}</View> : <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center', paddingVertical: 20 }}>{game.board?.map((mark: string | null, index: number) => <Pressable key={index} accessibilityLabel={`Square ${index + 1}: ${mark || 'empty'}`} disabled={busy || !!mark || game.status !== 'playing' || game.turn !== user?.id} style={{ width: '29%', aspectRatio: 1, borderRadius: 20, backgroundColor: 'white', borderWidth: 2, borderColor: c.line, alignItems: 'center', justifyContent: 'center' }} onPress={() => act(async () => { setGame(await api(`/games/${game.id}/move`, 'POST', { index })); })}><Text style={{ color: mark === 'X' ? c.brand : c.violet, fontSize: 48, fontWeight: '900' }}>{mark || ''}</Text></Pressable>)}</View>}<Button title="Refresh board" soft onPress={() => act(async () => { const games = await api('/games'); setGame(games.find((g: Item) => g.id === game.id)); })} /></View>;
+}
