@@ -9,13 +9,17 @@ on:
     paths:
       - "apps/mobile/**"
       - ".github/workflows/android-apk.yml"
+  pull_request:
+    paths:
+      - "apps/mobile/**"
+      - ".github/workflows/android-apk.yml"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: android-apk
+  group: android-apk-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -81,6 +85,8 @@ jobs:
           retention-days: 14
 
       - name: Publish to fixed release
+        # PR builds only check that the APK builds; only main updates the download link.
+        if: github.ref == 'refs/heads/main'
         working-directory: ${{ github.workspace }}
         env:
           GH_TOKEN: ${{ github.token }}
